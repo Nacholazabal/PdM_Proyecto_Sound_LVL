@@ -15,7 +15,7 @@
 #include "usb_cdc.h"
 #include "string.h"
 #include "debug_uart.h"
-
+#include "rfid.h"
 
 /**
  * @brief Enumeration of the main application states.
@@ -31,6 +31,27 @@ typedef enum {
 } MainApplicationState;
 
 MainApplicationState application_state;  ///< Global application state variable
+
+// Tipos de acciones posibles para seguridad
+typedef enum {
+    SECURITY_NONE,         // No hay acción pendiente
+    SECURITY_REGISTER,     // Se quiere registrar una nueva tarjeta
+    SECURITY_AUTHENTICATE  // Se quiere autenticar una tarjeta para una acción
+} SecurityAction;
+
+// Estructura que contiene el estado del pedido de seguridad
+typedef struct {
+    SecurityAction action; // Qué acción se pidió
+    bool result;           // Resultado de la acción (true = éxito)
+    bool pending;          // true = esperando procesar
+} SecurityRequest;
+
+// Variable estática: sólo visible en este archivo
+static SecurityRequest sec_request = {
+    .action = SECURITY_NONE,
+    .result = false,
+    .pending = false
+};
 
 // Forward declarations of state handler functions.
 static void on_initializing(void);
@@ -99,6 +120,7 @@ static void on_initializing(void)
 
     debug_uart_init();
     debug_uart_print("App initialized\r\n");
+    rfid_init();
     // TODO: Initialize other drivers (mic, oled, SD, USB, etc.)
 
     // Once all peripheral initialization is completed, transition to IDLE.
@@ -171,38 +193,89 @@ static void on_logging(void)
  * Processes USB CDC commands (e.g., list files, send file, delete file).
  * After executing a command, the state transitions back to the IDLE state.
  */
-static void on_usb_command(void)
-{
-
-    const char* cmd = usb_cdc_getCommand();
-    debug_uart_print("COMMAND PROCESSING\r\n");
-
-    if (strcmp(cmd, USB_CMD_LED_ON) == 0)
-    {
-        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-        usb_cdc_sendString("LED turned on\r\n");
-    }
-    else if (strcmp(cmd, USB_CMD_LED_OFF) == 0)
-    {
-        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-        usb_cdc_sendString("LED turned off\r\n");
-    }
-    else
-    {
-        usb_cdc_sendString("Unknown command\r\n");
+void on_usb_command(void) {
+    if (sec_request.pending) {
+        // Aún esperando resultado del estado SECURITY
+        return;
     }
 
-    // Clear the command so that the flag is reset.
-    usb_cdc_clearCommand();
+    // Si acabamos de volver de SECURITY
+    if (sec_request.action != SECURITY_NONE) {
+        if (sec_request.result) {
+            debug_uart_print("RFID autorizado correctamente\r\n");
 
-    // Once command processing is completed, transition back to IDLE.
-    application_state = IDLE;
+            // Aquí harías el cambio de threshold superior
+            // TODO: guardar nuevo threshold en EEPROM I2C
+            // Por ahora solo simula
+            debug_uart_print("Nuevo threshold aplicado (simulado)\r\n");
+
+        } else {
+            debug_uart_print("RFID NO autorizado, cambio cancelado\r\n");
+        }
+
+        // Limpiamos solicitud
+        sec_request.action = SECURITY_NONE;
+        application_state = IDLE;
+        return;
+    }
+
+    // Simulamos recibir un comando por CDC que dice: "cambiar threshold superior"
+    // En ese caso, lanzamos autenticación RFID
+    debug_uart_print("Requiere autenticación para cambiar threshold\r\n");
+    sec_request.action = SECURITY_AUTHENTICATE;
+    sec_request.pending = true;
+    application_state = SECURITY;
 }
 
-static void on_security(void)
-{
+void on_security(void) {
+	    // Si no hay pedido pendiente, salir
+	    if (!sec_request.pending) {
+	    	application_state = IDLE;
+	        return;
+	    }
 
+	    // Buffer para UID leído
+	    uint8_t uid[10];
+	    size_t uid_len = 0;
+
+	    // Intentar leer tarjeta
+	    if (!rfid_read_uid(uid, &uid_len)) {
+	        debug_uart_print("Fallo al leer tarjeta RFID\r\n");
+	        sec_request.result = false;
+	    } else {
+	        switch (sec_request.action) {
+	            case SECURITY_REGISTER:
+	                sec_request.result = rfid_register_card(uid, uid_len);
+	                if (sec_request.result) {
+	                    debug_uart_print("Tarjeta registrada con éxito\r\n");
+	                } else {
+	                    debug_uart_print("Error al registrar tarjeta (ya existe?)\r\n");
+	                }
+	                break;
+
+	            case SECURITY_AUTHENTICATE:
+	                sec_request.result = rfid_authenticate(uid, uid_len);
+	                if (sec_request.result) {
+	                    debug_uart_print("RFID autorizado\r\n");
+	                    // TODO: realizar la acción original (ej: cambiar thresholds)
+	                } else {
+	                    debug_uart_print("RFID no autorizado\r\n");
+	                }
+	                break;
+
+	            default:
+	                // Seguridad sin acción válida
+	                break;
+	        }
+	    }
+
+	    // Limpiar solicitud y volver a IDLE
+	    sec_request.pending = false;
+	    sec_request.action = SECURITY_NONE;
+	    application_state = IDLE;
 }
+
+
 
 /**
  * @brief Handles the ERROR state.

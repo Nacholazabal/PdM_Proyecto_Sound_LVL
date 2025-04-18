@@ -5,9 +5,8 @@
 extern SPI_HandleTypeDef hspi3;
 
 // GPIO for RC522 CS
-#define RFID_CS_PORT   GPIOA
-#define RFID_CS_PIN    GPIO_PIN_4
-
+#define RFID_CS_PORT   GPIOD
+#define RFID_CS_PIN    GPIO_PIN_2
 // RC522 command and register definitions
 #define CMD_IDLE            0x00
 #define CMD_TRANSCEIVE      0x0C

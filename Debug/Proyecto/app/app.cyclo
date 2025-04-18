@@ -1,8 +1,8 @@
-../Proyecto/app/app.c:49:6:app_entry_point	7
-../Proyecto/app/app.c:87:13:on_initializing	1
-../Proyecto/app/app.c:115:13:on_idle	3
-../Proyecto/app/app.c:145:13:on_monitoring	1
-../Proyecto/app/app.c:160:13:on_logging	1
-../Proyecto/app/app.c:174:13:on_usb_command	3
-../Proyecto/app/app.c:202:13:on_security	1
-../Proyecto/app/app.c:213:13:on_app_error	1
+../Proyecto/app/app.c:70:6:app_entry_point	7
+../Proyecto/app/app.c:108:13:on_initializing	1
+../Proyecto/app/app.c:137:13:on_idle	3
+../Proyecto/app/app.c:167:13:on_monitoring	1
+../Proyecto/app/app.c:182:13:on_logging	1
+../Proyecto/app/app.c:196:6:on_usb_command	4
+../Proyecto/app/app.c:230:6:on_security	7
+../Proyecto/app/app.c:286:13:on_app_error	1
