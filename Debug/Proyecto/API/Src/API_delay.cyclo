@@ -1,0 +1,5 @@
+../Proyecto/API/Src/API_delay.c:4:6:delayInit	1
+../Proyecto/API/Src/API_delay.c:12:8:delayRead	2
+../Proyecto/API/Src/API_delay.c:31:6:delayWrite	1
+../Proyecto/API/Src/API_delay.c:37:6:delay_stop	1
+../Proyecto/API/Src/API_delay.c:44:8:delayIsRunning	1

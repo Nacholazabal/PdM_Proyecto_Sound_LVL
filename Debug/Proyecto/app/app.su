@@ -1,0 +1,7 @@
+../Proyecto/app/app.c:47:6:app_entry_point	8	static
+../Proyecto/app/app.c:82:13:on_initializing	8	static
+../Proyecto/app/app.c:110:13:on_idle	8	static
+../Proyecto/app/app.c:140:13:on_recording	4	static
+../Proyecto/app/app.c:155:13:on_processing	4	static
+../Proyecto/app/app.c:169:13:on_usb_command	16	static
+../Proyecto/app/app.c:203:13:on_app_error	4	static

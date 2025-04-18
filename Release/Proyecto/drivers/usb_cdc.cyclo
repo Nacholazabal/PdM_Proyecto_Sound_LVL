@@ -1,0 +1,6 @@
+../Proyecto/drivers/usb_cdc.c:21:6:usb_cdc_init	1
+../Proyecto/drivers/usb_cdc.c:36:6:usb_cdc_receiveCallback	6
+../Proyecto/drivers/usb_cdc.c:58:6:usb_cdc_isCommandPending	1
+../Proyecto/drivers/usb_cdc.c:68:13:usb_cdc_getCommand	1
+../Proyecto/drivers/usb_cdc.c:76:6:usb_cdc_clearCommand	1
+../Proyecto/drivers/usb_cdc.c:90:5:usb_cdc_sendString	1

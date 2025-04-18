@@ -1,0 +1,2 @@
+../Proyecto/app/app_isr.c:22:6:HAL_GPIO_EXTI_Callback	16	static
+../Proyecto/app/app_isr.c:40:6:app_isr_button_handler	8	static

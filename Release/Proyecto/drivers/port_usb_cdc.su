@@ -1,0 +1,2 @@
+../Proyecto/drivers/port_usb_cdc.c:18:5:port_usb_cdc_transmit	8	static
+../Proyecto/drivers/port_usb_cdc.c:32:6:port_usb_cdc_register_receive_callback	0	static
