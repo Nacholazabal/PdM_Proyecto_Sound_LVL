@@ -1,0 +1,7 @@
+../Proyecto/ports/port_rfid/port_rfid.c:33:20:_cs_low	1
+../Proyecto/ports/port_rfid/port_rfid.c:34:20:_cs_high	1
+../Proyecto/ports/port_rfid/port_rfid.c:39:6:port_rfid_write_reg	1
+../Proyecto/ports/port_rfid/port_rfid.c:51:9:port_rfid_read_reg	1
+../Proyecto/ports/port_rfid/port_rfid.c:64:6:port_rfid_command	8
+../Proyecto/ports/port_rfid/port_rfid.c:113:6:port_rfid_init	1
+../Proyecto/ports/port_rfid/port_rfid.c:128:6:port_rfid_read_uid	3
