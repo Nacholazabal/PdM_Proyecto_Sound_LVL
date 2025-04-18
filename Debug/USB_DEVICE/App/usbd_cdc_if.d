@@ -42,7 +42,7 @@ USB_DEVICE/App/usbd_cdc_if.o: ../USB_DEVICE/App/usbd_cdc_if.c \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h \
- C:/Users/Ignacio/Desktop/Postgrado/Programacion\ de\ MCUs/PdM_Proyecto_Sound_LVL/Proyecto/drivers/usb_cdc.h
+ C:/Users/Ignacio/Desktop/Postgrado/Programacion\ de\ MCUs/PdM_Proyecto_Sound_LVL/Proyecto/drivers/usb_cdc/usb_cdc.h
 ../USB_DEVICE/App/usbd_cdc_if.h:
 ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc/usbd_cdc.h:
 ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h:
@@ -87,4 +87,4 @@ USB_DEVICE/App/usbd_cdc_if.o: ../USB_DEVICE/App/usbd_cdc_if.c \
 ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h:
 ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h:
 ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h:
-C:/Users/Ignacio/Desktop/Postgrado/Programacion\ de\ MCUs/PdM_Proyecto_Sound_LVL/Proyecto/drivers/usb_cdc.h:
+C:/Users/Ignacio/Desktop/Postgrado/Programacion\ de\ MCUs/PdM_Proyecto_Sound_LVL/Proyecto/drivers/usb_cdc/usb_cdc.h:

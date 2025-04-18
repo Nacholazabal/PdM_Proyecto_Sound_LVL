@@ -23,9 +23,10 @@
 typedef enum {
     INITIALIZING = 0,  ///< System is initializing.
     IDLE,              ///< Waiting for command (button press or USB command).
-    RECORDING,         ///< Recording audio using ADC + DMA.
-    PROCESSING,        ///< Processing/saving recorded audio to SD card.
+    MONITORING,         ///< Recording audio using ADC + DMA.
+    LOGGING,        ///< Processing/saving recorded audio to SD card.
     USB_COMMAND,       ///< Handling USB CDC commands.
+	SECURITY,
     APP_ERROR              ///< Error state.
 } MainApplicationState;
 
@@ -34,9 +35,10 @@ MainApplicationState application_state;  ///< Global application state variable
 // Forward declarations of state handler functions.
 static void on_initializing(void);
 static void on_idle(void);
-static void on_recording(void);
-static void on_processing(void);
+static void on_monitoring(void);
+static void on_logging(void);
 static void on_usb_command(void);
+static void on_security(void);
 static void on_app_error(void);
 
 /**
@@ -56,14 +58,17 @@ void app_entry_point(void)
             case IDLE:
                 on_idle();
                 break;
-            case RECORDING:
-                on_recording();
+            case MONITORING:
+                on_monitoring();
                 break;
-            case PROCESSING:
-                on_processing();
+            case LOGGING:
+                on_logging();
                 break;
             case USB_COMMAND:
                 on_usb_command();
+                break;
+            case SECURITY:
+                on_security();
                 break;
             case APP_ERROR:
             default:
@@ -137,13 +142,13 @@ static void on_idle(void)
  * After the recording is stopped (either by fixed duration or button press),
  * the state transitions to PROCESSING.
  */
-static void on_recording(void)
+static void on_monitoring(void)
 {
     // TODO: Start ADC conversion with DMA.
     // Record audio into a RAM buffer.
 
     // For demonstration, simulate recording done by transitioning immediately.
-    application_state = PROCESSING;
+    //application_state = PROCESSING;
 }
 
 /**
@@ -152,7 +157,7 @@ static void on_recording(void)
  * In this state, the recorded audio data (from RAM) is saved to the SD card using SPI + FatFs.
  * Once the data is saved, the system transitions back to the IDLE state.
  */
-static void on_processing(void)
+static void on_logging(void)
 {
     // TODO: Implement saving of audio data to the SD card.
 
@@ -192,6 +197,11 @@ static void on_usb_command(void)
 
     // Once command processing is completed, transition back to IDLE.
     application_state = IDLE;
+}
+
+static void on_security(void)
+{
+
 }
 
 /**

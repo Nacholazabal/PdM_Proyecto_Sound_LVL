@@ -1,0 +1,2 @@
+../Proyecto/drivers/uart/debug_uart.c:18:6:debug_uart_init	1
+../Proyecto/drivers/uart/debug_uart.c:24:5:debug_uart_print	3
