@@ -9,7 +9,11 @@
 #include "app_isr.h"
 #include "button.h"
 #include "port_button.h"  // This should define BUTTON_PIN
+#include "app.h"
+#include "debug_uart.h"
 
+uint16_t adc_dma_buffer[ADC_BUFFER_SIZE];
+volatile uint16_t envelope = 0;
 /**
  * @brief Override of the HAL GPIO EXTI Callback.
  *
@@ -42,3 +46,25 @@ void app_isr_button_handler(void)
     // Update the debouncing state machine in the button driver.
     button_update();
 }
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+    if (hadc->Instance == ADC1) {
+        // 1) Compute DC bias
+        uint32_t sum = 0;
+        for (int i = 0; i < ADC_BUFFER_SIZE; i++) {
+            sum += adc_dma_buffer[i];
+        }
+        uint16_t bias = sum / ADC_BUFFER_SIZE;
+
+        // 2) Compute mean absolute deviation (“envelope”)
+        uint32_t abs_sum = 0;
+        for (int i = 0; i < ADC_BUFFER_SIZE; i++) {
+            int32_t d = (int32_t)adc_dma_buffer[i] - (int32_t)bias;
+            abs_sum += (d < 0 ? -d : d);
+        }
+        envelope = abs_sum / ADC_BUFFER_SIZE;
+    }
+}
+
+

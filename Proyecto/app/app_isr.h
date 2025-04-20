@@ -9,6 +9,13 @@
 
 #ifndef APP_ISR_H
 #define APP_ISR_H
+#include <stdint.h>
+#include <stdbool.h>
+
+#define ADC_BUFFER_SIZE 256
+
+extern uint16_t          adc_dma_buffer[ADC_BUFFER_SIZE];
+extern volatile uint16_t envelope;
 
 /**
  * @brief Handles the button interrupt event.

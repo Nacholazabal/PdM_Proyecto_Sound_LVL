@@ -1,6 +1,7 @@
 #include "port_rfid.h"
 #include "stm32f4xx_hal.h"
-
+#include "debug_uart.h"
+#include <stdio.h>
 // SPI handle (SPI3)
 extern SPI_HandleTypeDef hspi3;
 
@@ -11,6 +12,7 @@ extern SPI_HandleTypeDef hspi3;
 #define CMD_IDLE            0x00
 #define CMD_TRANSCEIVE      0x0C
 
+#define RFID_REG_VERSION 0x37
 #define REG_COMMAND         0x01
 #define REG_COM_I_EN        0x02
 #define REG_DIV_I_EN        0x03
@@ -95,6 +97,10 @@ bool port_rfid_command(const uint8_t *cmd, size_t cmd_len, uint8_t *response, si
     // Read how many bytes in FIFO
     uint8_t count = port_rfid_read_reg(REG_FIFO_LEVEL);
     if (count == 0 || count > *resp_len) {
+    	char buf[64];
+    	sprintf(buf, "IRQ=0x%02X ERR=0x%02X FIFO=%d\r\n", irq, error, count);
+    	debug_uart_print(buf);
+
         return false;
     }
 
@@ -103,6 +109,22 @@ bool port_rfid_command(const uint8_t *cmd, size_t cmd_len, uint8_t *response, si
         response[i] = port_rfid_read_reg(REG_FIFO_DATA);
     }
     *resp_len = count;
+    return true;
+}
+
+bool port_rfid_requestA(void) {
+    uint8_t cmd = 0x26;  // REQA (7-bit, pero lo mandamos como 8 bits)
+    uint8_t response[10];
+    size_t  response_len = sizeof(response);
+
+    if (!port_rfid_command(&cmd, 1, response, &response_len)) {
+        debug_uart_print("REQA failed\r\n");
+        return false;
+    }
+
+    char buf[64];
+    sprintf(buf, "REQA OK, got %u bytes\r\n", (unsigned int)response_len);
+    debug_uart_print(buf);
     return true;
 }
 
@@ -118,6 +140,14 @@ bool port_rfid_init(void) {
     port_rfid_write_reg(REG_COMMAND, CMD_IDLE);
     // Turn on antenna: TxControlReg bit 0x03
     port_rfid_write_reg(REG_TX_CONTROL, 0x03);
+
+    uint8_t version = port_rfid_read_reg(RFID_REG_VERSION);
+    char buf[64];
+    sprintf(buf, "Versión chip RFID: 0x%02X\r\n", version);
+    debug_uart_print(buf);
+
+    port_rfid_requestA();
+
     return true;
 }
 
@@ -127,16 +157,20 @@ bool port_rfid_init(void) {
 bool port_rfid_read_uid(uint8_t *uid, size_t *uid_len) {
     uint8_t cmd[] = { PICC_ANTICOLL, PICC_ANTICOLL_NVB };
     uint8_t resp[10];
-    size_t  resp_sz = sizeof(resp);
+    size_t resp_sz = sizeof(resp);
 
     if (!port_rfid_command(cmd, sizeof(cmd), resp, &resp_sz)) {
         return false;
     }
-    // UID is first 5 bytes (4 UID + 1 BCC)
+
     if (resp_sz < 5) {
         return false;
     }
+
     memcpy(uid, resp, 4);
     *uid_len = 4;
     return true;
 }
+
+
+

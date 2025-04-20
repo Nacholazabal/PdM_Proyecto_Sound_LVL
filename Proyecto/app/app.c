@@ -16,6 +16,28 @@
 #include "string.h"
 #include "debug_uart.h"
 #include "rfid.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <math.h>
+#include "API_delay.h"
+#include "app_isr.h"
+
+// number of ADC samples to average
+#define ADC_BUFFER_SIZE 256
+
+extern TIM_HandleTypeDef htim2;
+// these live in this module:
+extern ADC_HandleTypeDef hadc1;
+extern uint16_t             adc_dma_buffer[ADC_BUFFER_SIZE];
+extern volatile uint16_t    envelope;
+delay_t delay_monitor;
+volatile bool    adc_ready = false;
+
+// (you probably already have your threshold variables somewhere
+//  – if not, add something like:)
+//extern uint16_t threshold_low;
+//extern uint16_t threshold_medium;
 
 /**
  * @brief Enumeration of the main application states.
@@ -110,20 +132,19 @@ static void on_initializing(void)
     // Initialize the button driver (debouncing state machine and HAL interface)
     button_init();
 
-    // Initialize the display
-    //oled_init();        // This calls port_oled_init() and clears the display
-    //oled_clear();
-    //oled_set_cursor(0, 0);
-    //oled_print("App initialized");
-
     usb_cdc_init();
 
     debug_uart_init();
     debug_uart_print("App initialized\r\n");
     rfid_init();
     // TODO: Initialize other drivers (mic, oled, SD, USB, etc.)
+    // kick off the timer so it will fire at 64 Hz
+    HAL_TIM_Base_Start(&htim2);
 
+    // start ADC in circular‑DMA — now each TIM2 TRGO will fire one conversion
+    HAL_ADC_Start_DMA(&hadc1,(uint32_t*)adc_dma_buffer,ADC_BUFFER_SIZE);
     // Once all peripheral initialization is completed, transition to IDLE.
+    delayInit(&delay_monitor, 500);
     application_state = IDLE;
 }
 
@@ -136,6 +157,12 @@ static void on_initializing(void)
  */
 static void on_idle(void)
 {
+	    // ─── catch the DMA flag first ───
+    if (delayRead(&delay_monitor)) {
+	    debug_uart_print("MONITORING\r\n");
+	    application_state = MONITORING;
+	    return;             // don’t run the rest of IDLE
+    }
     // Update the button's debounce logic
     button_update();
 
@@ -153,6 +180,7 @@ static void on_idle(void)
         // Transition to the USB_COMMAND state for processing the command.
         application_state = USB_COMMAND;
     }
+
 }
 
 /**
@@ -166,11 +194,14 @@ static void on_idle(void)
  */
 static void on_monitoring(void)
 {
-    // TODO: Start ADC conversion with DMA.
-    // Record audio into a RAM buffer.
+    // Read the precomputed envelope
+    char msg[64];
+    sprintf(msg, "ENV = %u counts\r\n", envelope);
+    debug_uart_print(msg);
 
-    // For demonstration, simulate recording done by transitioning immediately.
-    //application_state = PROCESSING;
+    // Restart the 500 ms timer
+    delayInit(&delay_monitor, 500);
+    application_state = IDLE;
 }
 
 /**
@@ -194,38 +225,64 @@ static void on_logging(void)
  * After executing a command, the state transitions back to the IDLE state.
  */
 void on_usb_command(void) {
+    const char* cmd = usb_cdc_getCommand();
+
+    // --- Si estamos esperando validación RFID ---
     if (sec_request.pending) {
-        // Aún esperando resultado del estado SECURITY
-        return;
+        debug_uart_print("COMMAND PENDING\r\n");
+        return; // NO BORRAR COMANDO TODAVÍA, esperá a resolver SECURITY
     }
 
-    // Si acabamos de volver de SECURITY
+    // --- Si SECURITY ya resolvió una solicitud anterior ---
     if (sec_request.action != SECURITY_NONE) {
         if (sec_request.result) {
-            debug_uart_print("RFID autorizado correctamente\r\n");
-
-            // Aquí harías el cambio de threshold superior
-            // TODO: guardar nuevo threshold en EEPROM I2C
-            // Por ahora solo simula
-            debug_uart_print("Nuevo threshold aplicado (simulado)\r\n");
-
+            if (sec_request.action == SECURITY_AUTHENTICATE) {
+                debug_uart_print("RFID autorizado correctamente para cambiar threshold\r\n");
+                debug_uart_print("Nuevo threshold aplicado (simulado)\r\n");
+            } else if (sec_request.action == SECURITY_REGISTER) {
+                debug_uart_print("Tarjeta registrada correctamente\r\n");
+            }
         } else {
-            debug_uart_print("RFID NO autorizado, cambio cancelado\r\n");
+            debug_uart_print("Acción cancelada: RFID no autorizado\r\n");
         }
 
-        // Limpiamos solicitud
         sec_request.action = SECURITY_NONE;
+        sec_request.pending = false;
         application_state = IDLE;
+        usb_cdc_clearCommand();
         return;
     }
 
-    // Simulamos recibir un comando por CDC que dice: "cambiar threshold superior"
-    // En ese caso, lanzamos autenticación RFID
-    debug_uart_print("Requiere autenticación para cambiar threshold\r\n");
-    sec_request.action = SECURITY_AUTHENTICATE;
-    sec_request.pending = true;
-    application_state = SECURITY;
+    // --- Procesar comando recibido ---
+    if (strcmp(cmd, USB_CMD_LED_ON) == 0) {
+        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+        debug_uart_print("LED encendido\r\n");
+        application_state = IDLE;
+
+    } else if (strcmp(cmd, USB_CMD_LED_OFF) == 0) {
+        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+        debug_uart_print("LED apagado\r\n");
+        application_state = IDLE;
+
+    } else if (strcmp(cmd, USB_CMD_CHANGE_THRESHOLD) == 0) {
+        debug_uart_print("Requiere autenticación para cambiar threshold\r\n");
+        sec_request.action = SECURITY_AUTHENTICATE;
+        sec_request.pending = true;
+        application_state = SECURITY;
+
+    } else if (strcmp(cmd, USB_COMMAND_REGISTER_RFID) == 0) {
+        debug_uart_print("Registrar tarjeta\r\n");
+        sec_request.action = SECURITY_REGISTER;
+        sec_request.pending = true;
+        application_state = SECURITY;
+
+    } else {
+        debug_uart_print("Comando desconocido\r\n");
+    }
+
+    usb_cdc_clearCommand();
 }
+
 
 void on_security(void) {
 	    // Si no hay pedido pendiente, salir
@@ -274,8 +331,6 @@ void on_security(void) {
 	    sec_request.action = SECURITY_NONE;
 	    application_state = IDLE;
 }
-
-
 
 /**
  * @brief Handles the ERROR state.
