@@ -28,13 +28,15 @@ static uint16_t    threshold_high;
 extern volatile uint16_t envelope;
 extern uint16_t          adc_dma_buffer[ADC_BUFFER_SIZE];
 
+extern TIM_HandleTypeDef htim2;
+extern ADC_HandleTypeDef hadc1;
 // carry parsed values from USB into on_usb_command
 static pending_action_t pending_action;
-extern TIM_HandleTypeDef htim2;
 
 //─── Initialization ─────────────────────────────────────────────────────────
 static void on_initializing(void)
 {
+	debug_uart_print("INIT: entering on_initializing()\r\n");
     usb_commands_init();
     eeprom_init();
     rtc_init();
@@ -50,6 +52,7 @@ static void on_initializing(void)
 
     // start a 1 s non‑blocking delay
     delayInit(&measureDelay, 1000);
+    debug_uart_print("INIT: drivers initialized\r\n");
 
     application_state = STATE_IDLE;
 }
@@ -123,7 +126,7 @@ static void on_usb_command(void)
             if (rtc_get_datetime(&dt)) {
                 char msg[64];
                 sprintf(msg, "%02u/%02u/20%02u %02u:%02u:%02u\r\n",
-                        dt.date, dt.month, dt.year,
+                        dt.day, dt.month, dt.year,
                         dt.hour, dt.min, dt.sec);
                 debug_uart_print(msg);
             } else {
@@ -150,7 +153,7 @@ static void on_usb_command(void)
                     char msg[64];
                     sprintf(msg,
                             "%02u/%02u/20%02u %02u:%02u:%02u Lvl=%u\r\n",
-                            entries[i].date,
+                            entries[i].day,
                             entries[i].month,
                             entries[i].year,
                             entries[i].hour,
@@ -177,10 +180,18 @@ void app_entry_point(void)
 {
     while (1) {
         switch (application_state) {
-            case STATE_INITIALIZING: on_initializing();   break;
-            case STATE_IDLE:         on_idle();           break;
-            case STATE_MONITORING:   on_monitoring();     break;
-            case STATE_USB_COMMAND:  on_usb_command();    break;
+            case STATE_INITIALIZING:
+            	on_initializing();
+            	break;
+            case STATE_IDLE:
+            	on_idle();
+            	break;
+            case STATE_MONITORING:
+            	on_monitoring();
+            	break;
+            case STATE_USB_COMMAND:
+            	on_usb_command();
+            	break;
         }
     }
 }

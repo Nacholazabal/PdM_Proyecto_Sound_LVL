@@ -1,7 +1,7 @@
 #include "eeprom.h"
 #include "port_eeprom.h"
 #include <string.h>
-
+#include "debug_uart.h"
 
 // ——— Initialize EEPROM and thresholds ———
 bool eeprom_init(void)

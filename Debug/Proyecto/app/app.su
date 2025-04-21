@@ -1,0 +1,5 @@
+../Proyecto/app/app.c:37:13:on_initializing	8	static
+../Proyecto/app/app.c:61:13:on_idle	8	static
+../Proyecto/app/app.c:74:13:on_monitoring	80	static
+../Proyecto/app/app.c:101:13:on_usb_command	200	static
+../Proyecto/app/app.c:179:6:app_entry_point	8	static

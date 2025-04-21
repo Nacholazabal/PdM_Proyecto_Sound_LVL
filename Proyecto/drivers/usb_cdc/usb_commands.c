@@ -31,7 +31,7 @@ usb_command_t usb_commands_get(pending_action_t *out) {
     }
     // SET_TIME Y M D h m s
     else if (sscanf(cmd, USB_CMD_SET_TIME " %hhu %hhu %hhu %hhu %hhu %hhu",
-                    &out->dt.year, &out->dt.month, &out->dt.date,
+                    &out->dt.year, &out->dt.month, &out->dt.day,
                     &out->dt.hour, &out->dt.min, &out->dt.sec) == 6) {
         out->cmd = CMD_SET_TIME;
     }
