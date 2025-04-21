@@ -30,11 +30,15 @@ Middlewares/ST/STM32_USB_Device_Library/Core/Src \
 Proyecto/API/Src \
 Proyecto/app \
 Proyecto/drivers/button \
+Proyecto/drivers/eeprom \
 Proyecto/drivers/rfid \
+Proyecto/drivers/rtc \
 Proyecto/drivers/uart \
 Proyecto/drivers/usb_cdc \
 Proyecto/ports/port_button \
+Proyecto/ports/port_eeprom \
 Proyecto/ports/port_rfid \
+Proyecto/ports/port_rtc \
 Proyecto/ports/port_usb_cdc \
 Proyecto \
 USB_DEVICE/App \

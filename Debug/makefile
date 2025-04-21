@@ -12,11 +12,15 @@ RM := rm -rf
 -include USB_DEVICE/Target/subdir.mk
 -include USB_DEVICE/App/subdir.mk
 -include Proyecto/ports/port_usb_cdc/subdir.mk
+-include Proyecto/ports/port_rtc/subdir.mk
 -include Proyecto/ports/port_rfid/subdir.mk
+-include Proyecto/ports/port_eeprom/subdir.mk
 -include Proyecto/ports/port_button/subdir.mk
 -include Proyecto/drivers/usb_cdc/subdir.mk
 -include Proyecto/drivers/uart/subdir.mk
+-include Proyecto/drivers/rtc/subdir.mk
 -include Proyecto/drivers/rfid/subdir.mk
+-include Proyecto/drivers/eeprom/subdir.mk
 -include Proyecto/drivers/button/subdir.mk
 -include Proyecto/app/subdir.mk
 -include Proyecto/API/Src/subdir.mk
