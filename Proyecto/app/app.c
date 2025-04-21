@@ -30,6 +30,7 @@ extern uint16_t          adc_dma_buffer[ADC_BUFFER_SIZE];
 
 // carry parsed values from USB into on_usb_command
 static pending_action_t pending_action;
+extern TIM_HandleTypeDef htim2;
 
 //─── Initialization ─────────────────────────────────────────────────────────
 static void on_initializing(void)
