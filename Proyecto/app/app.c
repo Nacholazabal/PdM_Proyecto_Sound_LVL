@@ -4,6 +4,7 @@
 #include "app.h"
 #include "app_isr.h"
 #include "usb_commands.h"
+#include "usb_cdc.h"
 #include "eeprom.h"
 #include "rtc.h"
 #include "debug_uart.h"
@@ -30,8 +31,6 @@ extern uint16_t          adc_dma_buffer[ADC_BUFFER_SIZE];
 
 extern TIM_HandleTypeDef htim2;
 extern ADC_HandleTypeDef hadc1;
-// carry parsed values from USB into on_usb_command
-static pending_action_t pending_action;
 
 //─── Initialization ─────────────────────────────────────────────────────────
 static void on_initializing(void)
@@ -86,10 +85,18 @@ static void on_monitoring(void)
     else {
         // TODO: light all 6 LEDs
         // log timestamp
-        rtc_datetime_t now;
-        if (rtc_get_datetime(&now)) {
-            eeprom_log_high_event((eeprom_log_entry_t*)&now);
-        }
+    	rtc_datetime_t dt;
+    	if (rtc_get_datetime(&dt)) {
+    	    eeprom_log_entry_t entry;
+    	    entry.year   = dt.year;
+    	    entry.month  = dt.month;
+    	    entry.day    = dt.date;
+    	    entry.hour   = dt.hour;
+    	    entry.minute = dt.min;
+    	    entry.second = dt.sec;
+    	    entry.level  = envelope;
+    	    eeprom_log_high_event(&entry);
+    	}
     }
 
     // restart 1 s and go back
@@ -100,70 +107,66 @@ static void on_monitoring(void)
 //─── USB Command handler ─────────────────────────────────────────────────────
 static void on_usb_command(void)
 {
-    usb_command_t cmd = usb_commands_get(&pending_action);
+    pending_action_t act;
+    char buf[64];
+    usb_command_t cmd = usb_commands_get(&act);
     switch (cmd) {
         case CMD_GET_THRESH: {
-            char msg[64];
-            sprintf(msg, "TH_LOW=%u TH_HIGH=%u\r\n",
-                    threshold_low, threshold_high);
-            debug_uart_print(msg);
+            snprintf(buf, sizeof(buf),
+                     "TH_LOW=%u TH_HIGH=%u\r\n",
+                     threshold_low, threshold_high);
+            usb_cdc_sendString(buf);
             break;
         }
         case CMD_SET_THRESH: {
-            if (eeprom_write_thresholds(pending_action.low,
-                                        pending_action.high))
-            {
-                threshold_low  = pending_action.low;
-                threshold_high = pending_action.high;
-                debug_uart_print("Thresholds updated\r\n");
+            if (eeprom_write_thresholds(act.low, act.high)) {
+                threshold_low  = act.low;
+                threshold_high = act.high;
+                usb_cdc_sendString("Thresholds updated\r\n");
             } else {
-                debug_uart_print("EEPROM write error\r\n");
+                usb_cdc_sendString("EEPROM write error\r\n");
             }
             break;
         }
         case CMD_GET_TIME: {
             rtc_datetime_t dt;
             if (rtc_get_datetime(&dt)) {
-                char msg[64];
-                sprintf(msg, "%02u/%02u/20%02u %02u:%02u:%02u\r\n",
-                        dt.day, dt.month, dt.year,
-                        dt.hour, dt.min, dt.sec);
-                debug_uart_print(msg);
+                snprintf(buf, sizeof(buf),
+                         "%02u/%02u/20%02u %02u:%02u:%02u\r\n",
+                         dt.date, dt.month, dt.year,
+                         dt.hour, dt.min, dt.sec);
+                usb_cdc_sendString(buf);
             } else {
-                debug_uart_print("RTC: ND\r\n");
+                usb_cdc_sendString("RTC: ND\r\n");
             }
             break;
         }
         case CMD_SET_TIME: {
-            if (rtc_set_datetime(&pending_action.dt)) {
-                debug_uart_print("RTC updated\r\n");
+            if (rtc_set_datetime(&act.dt)) {
+                usb_cdc_sendString("RTC updated\r\n");
             } else {
-                debug_uart_print("RTC write error\r\n");
+                usb_cdc_sendString("RTC write error\r\n");
             }
             break;
         }
         case CMD_GET_LOG: {
             eeprom_log_entry_t entries[EEPROM_LOG_MAX_ENTRIES];
             uint8_t count;
-            if (eeprom_read_log(entries,
-                                EEPROM_LOG_MAX_ENTRIES,
-                                &count))
-            {
+            if (eeprom_read_log(entries, EEPROM_LOG_MAX_ENTRIES, &count)) {
                 for (uint8_t i = 0; i < count; i++) {
-                    char msg[64];
-                    sprintf(msg,
-                            "%02u/%02u/20%02u %02u:%02u:%02u Lvl=%u\r\n",
-                            entries[i].day,
-                            entries[i].month,
-                            entries[i].year,
-                            entries[i].hour,
-                            entries[i].minute,
-                            entries[i].second,
-                            entries[i].level);
-                    debug_uart_print(msg);
+                    snprintf(buf, sizeof(buf),
+                             "%02u/%02u/20%02u %02u:%02u:%02u Lvl=%u\r\n",
+                             entries[i].day,
+                             entries[i].month,
+                             entries[i].year,
+                             entries[i].hour,
+                             entries[i].minute,
+                             entries[i].second,
+                             entries[i].level);
+                    usb_cdc_sendString(buf);
                 }
             } else {
-                debug_uart_print("Log empty or error\r\n");
+                usb_cdc_sendString("Log empty or error\r\n");
             }
             break;
         }

@@ -1,5 +1,5 @@
-../Proyecto/app/app.c:37:13:on_initializing	1
-../Proyecto/app/app.c:61:13:on_idle	3
-../Proyecto/app/app.c:74:13:on_monitoring	4
-../Proyecto/app/app.c:101:13:on_usb_command	11
-../Proyecto/app/app.c:179:6:app_entry_point	5
+../Proyecto/app/app.c:36:13:on_initializing	1
+../Proyecto/app/app.c:60:13:on_idle	3
+../Proyecto/app/app.c:73:13:on_monitoring	4
+../Proyecto/app/app.c:108:13:on_usb_command	11
+../Proyecto/app/app.c:182:6:app_entry_point	5

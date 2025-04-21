@@ -3,6 +3,7 @@
 #include "debug_uart.h"
 #include <string.h>
 #include <stdio.h>
+#include "rtc.h"
 
 void usb_commands_init(void) {
     // Ensure CDC driver is up
@@ -11,6 +12,24 @@ void usb_commands_init(void) {
 
 bool usb_commands_pending(void) {
     return usb_cdc_isCommandPending();
+}
+
+static bool parse_settime_args(const char *args, rtc_datetime_t *dt) {
+    unsigned int yy, MM, DD, hh, mm, ss;
+    int matched = sscanf(args,
+                         "%u %u %u %u %u %u",
+                         &yy, &MM, &DD, &hh, &mm, &ss);
+    if (matched != 6) {
+        return false;
+    }
+    dt->year   = (uint8_t)yy;
+    dt->month  = (uint8_t)MM;
+    dt->date   = (uint8_t)DD;
+    dt->hour   = (uint8_t)hh;
+    dt->min    = (uint8_t)mm;
+    dt->sec    = (uint8_t)ss;
+
+    return true;
 }
 
 usb_command_t usb_commands_get(pending_action_t *out) {
@@ -29,11 +48,15 @@ usb_command_t usb_commands_get(pending_action_t *out) {
     else if (strcmp(cmd, USB_CMD_GET_TIME) == 0) {
         out->cmd = CMD_GET_TIME;
     }
-    // SET_TIME Y M D h m s
-    else if (sscanf(cmd, USB_CMD_SET_TIME " %hhu %hhu %hhu %hhu %hhu %hhu",
-                    &out->dt.year, &out->dt.month, &out->dt.day,
-                    &out->dt.hour, &out->dt.min, &out->dt.sec) == 6) {
-        out->cmd = CMD_SET_TIME;
+    // SET_TIME …delegate to helper…
+    else if (strncmp(cmd, USB_CMD_SET_TIME " ", strlen(USB_CMD_SET_TIME) + 1) == 0)
+    {
+        const char *args = cmd + strlen(USB_CMD_SET_TIME) + 1;
+        if (parse_settime_args(args, &out->dt)) {
+            out->cmd = CMD_SET_TIME;
+        } else {
+            out->cmd = CMD_HELP;
+        }
     }
     // GET_LOG
     else if (strcmp(cmd, USB_CMD_GET_LOG) == 0) {
@@ -44,13 +67,12 @@ usb_command_t usb_commands_get(pending_action_t *out) {
         out->cmd = CMD_HELP;
     }
 
-    // Consume the pending flag and buffer
     usb_cdc_clearCommand();
     return out->cmd;
 }
 
 void usb_commands_print_help(void) {
-    debug_uart_print(
+    usb_cdc_sendString(
         "Commands:\r\n"
         "  getth                - Show thresholds\r\n"
         "  setth <low> <high>   - Set thresholds\r\n"
