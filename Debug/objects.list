@@ -43,6 +43,7 @@
 "./Proyecto/drivers/rtc/rtc.o"
 "./Proyecto/drivers/uart/debug_uart.o"
 "./Proyecto/drivers/usb_cdc/usb_cdc.o"
+"./Proyecto/drivers/usb_cdc/usb_commands.o"
 "./Proyecto/ports/port_button/port_button.o"
 "./Proyecto/ports/port_eeprom/port_eeprom.o"
 "./Proyecto/ports/port_rfid/port_rfid.o"

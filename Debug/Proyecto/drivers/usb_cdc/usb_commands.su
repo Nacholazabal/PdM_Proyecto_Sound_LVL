@@ -1,0 +1,4 @@
+../Proyecto/drivers/usb_cdc/usb_commands.c:7:6:usb_commands_init	8	static
+../Proyecto/drivers/usb_cdc/usb_commands.c:12:6:usb_commands_pending	8	static
+../Proyecto/drivers/usb_cdc/usb_commands.c:16:15:usb_commands_get	48	static
+../Proyecto/drivers/usb_cdc/usb_commands.c:52:6:usb_commands_print_help	8	static

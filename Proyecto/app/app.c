@@ -1,347 +1,185 @@
-/**********************************************************************************************************************
- * Copyright (c) 2024, Your Name
- *
- * This file is part of the Voice Recorder project.
- *
- * @file app.c
- * @brief Main application code for the voice recorder.
- **********************************************************************************************************************/
-
+// app.c
 #include "stm32f4xx_hal.h"
 #include "main.h"
 #include "app.h"
-#include "button.h"
-#include "usb_commands.h"
-#include "usb_cdc.h"
-#include "string.h"
-#include "debug_uart.h"
-#include "rfid.h"
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <math.h>
-#include "API_delay.h"
 #include "app_isr.h"
+#include "usb_commands.h"
+#include "eeprom.h"
+#include "rtc.h"
+#include "debug_uart.h"
+#include "API_delay.h"
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdint.h>
 
-// number of ADC samples to average
-#define ADC_BUFFER_SIZE 256
-
-extern TIM_HandleTypeDef htim2;
-// these live in this module:
-extern ADC_HandleTypeDef hadc1;
-extern uint16_t             adc_dma_buffer[ADC_BUFFER_SIZE];
-extern volatile uint16_t    envelope;
-delay_t delay_monitor;
-volatile bool    adc_ready = false;
-
-// (you probably already have your threshold variables somewhere
-//  – if not, add something like:)
-//extern uint16_t threshold_low;
-//extern uint16_t threshold_medium;
-
-/**
- * @brief Enumeration of the main application states.
- */
 typedef enum {
-    INITIALIZING = 0,  ///< System is initializing.
-    IDLE,              ///< Waiting for command (button press or USB command).
-    MONITORING,         ///< Recording audio using ADC + DMA.
-    LOGGING,        ///< Processing/saving recorded audio to SD card.
-    USB_COMMAND,       ///< Handling USB CDC commands.
-	SECURITY,
-    APP_ERROR              ///< Error state.
-} MainApplicationState;
+    STATE_INITIALIZING,
+    STATE_IDLE,
+    STATE_MONITORING,
+    STATE_USB_COMMAND
+} app_state_t;
 
-MainApplicationState application_state;  ///< Global application state variable
+static app_state_t application_state = STATE_INITIALIZING;
+static delay_t     measureDelay;
+static uint16_t    threshold_low;
+static uint16_t    threshold_high;
 
-// Tipos de acciones posibles para seguridad
-typedef enum {
-    SECURITY_NONE,         // No hay acción pendiente
-    SECURITY_REGISTER,     // Se quiere registrar una nueva tarjeta
-    SECURITY_AUTHENTICATE  // Se quiere autenticar una tarjeta para una acción
-} SecurityAction;
+// these live in app_isr.c
+extern volatile uint16_t envelope;
+extern uint16_t          adc_dma_buffer[ADC_BUFFER_SIZE];
 
-// Estructura que contiene el estado del pedido de seguridad
-typedef struct {
-    SecurityAction action; // Qué acción se pidió
-    bool result;           // Resultado de la acción (true = éxito)
-    bool pending;          // true = esperando procesar
-} SecurityRequest;
+// carry parsed values from USB into on_usb_command
+static pending_action_t pending_action;
 
-// Variable estática: sólo visible en este archivo
-static SecurityRequest sec_request = {
-    .action = SECURITY_NONE,
-    .result = false,
-    .pending = false
-};
-
-// Forward declarations of state handler functions.
-static void on_initializing(void);
-static void on_idle(void);
-static void on_monitoring(void);
-static void on_logging(void);
-static void on_usb_command(void);
-static void on_security(void);
-static void on_app_error(void);
-
-/**
- * @brief Entry point for the application.
- *
- * This function implements the main loop of the state machine.
- */
-void app_entry_point(void)
-{
-    application_state = INITIALIZING;
-
-    while (1) {
-        switch (application_state) {
-            case INITIALIZING:
-                on_initializing();
-                break;
-            case IDLE:
-                on_idle();
-                break;
-            case MONITORING:
-                on_monitoring();
-                break;
-            case LOGGING:
-                on_logging();
-                break;
-            case USB_COMMAND:
-                on_usb_command();
-                break;
-            case SECURITY:
-                on_security();
-                break;
-            case APP_ERROR:
-            default:
-                on_app_error();
-                break;
-        }
-    }
-}
-
-/**
- * @brief Handles the INITIALIZING state.
- *
- * Initializes all necessary modules and peripherals (e.g., button, mic, OLED, SD, USB).
- * After the initialization completes, transitions to IDLE state.
- */
+//─── Initialization ─────────────────────────────────────────────────────────
 static void on_initializing(void)
 {
-    // Initialize the button driver (debouncing state machine and HAL interface)
-    button_init();
+    usb_commands_init();
+    eeprom_init();
+    rtc_init();
 
-    usb_cdc_init();
+    // load or default thresholds
+    eeprom_read_thresholds(&threshold_low, &threshold_high);
 
-    debug_uart_init();
-    debug_uart_print("App initialized\r\n");
-    rfid_init();
-    // TODO: Initialize other drivers (mic, oled, SD, USB, etc.)
-    // kick off the timer so it will fire at 64 Hz
+    // kick off TIM2→ADC1@1kHz DMA→256 samples
     HAL_TIM_Base_Start(&htim2);
+    HAL_ADC_Start_DMA(&hadc1,
+                      (uint32_t*)adc_dma_buffer,
+                      ADC_BUFFER_SIZE);
 
-    // start ADC in circular‑DMA — now each TIM2 TRGO will fire one conversion
-    HAL_ADC_Start_DMA(&hadc1,(uint32_t*)adc_dma_buffer,ADC_BUFFER_SIZE);
-    // Once all peripheral initialization is completed, transition to IDLE.
-    delayInit(&delay_monitor, 500);
-    application_state = IDLE;
+    // start a 1 s non‑blocking delay
+    delayInit(&measureDelay, 1000);
+
+    application_state = STATE_IDLE;
 }
 
-/**
- * @brief Handles the IDLE state.
- *
- * In the IDLE state, the system polls the button and listens for USB commands.
- * When a complete button press (press-release) is detected, the state transitions
- * to RECORDING.
- */
+//─── Idle: wait for timeout or USB ────────────────────────────────────────────
 static void on_idle(void)
 {
-	    // ─── catch the DMA flag first ───
-    if (delayRead(&delay_monitor)) {
-	    debug_uart_print("MONITORING\r\n");
-	    application_state = MONITORING;
-	    return;             // don’t run the rest of IDLE
-    }
-    // Update the button's debounce logic
-    button_update();
-
-    // Process any button event as needed (e.g., button press triggers recording)
-    if (button_was_pressed()) {
-        // For demonstration, toggle LED to indicate button event.
-        HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-        // Optionally, transition to another state:
-        // application_state = RECORDING;
-    }
-
-    // Poll USB CDC for a complete command
-    if (usb_cdc_isCommandPending()) {
-    	debug_uart_print("COMMAND PENDING\r\n");
-        // Transition to the USB_COMMAND state for processing the command.
-        application_state = USB_COMMAND;
-    }
-
-}
-
-/**
- * @brief Handles the RECORDING state.
- *
- * In this state, audio is captured using ADC with DMA and stored in RAM.
- * The USB interface is disabled during the recording.
- *
- * After the recording is stopped (either by fixed duration or button press),
- * the state transitions to PROCESSING.
- */
-static void on_monitoring(void)
-{
-    // Read the precomputed envelope
-    char msg[64];
-    sprintf(msg, "ENV = %u counts\r\n", envelope);
-    debug_uart_print(msg);
-
-    // Restart the 500 ms timer
-    delayInit(&delay_monitor, 500);
-    application_state = IDLE;
-}
-
-/**
- * @brief Handles the PROCESSING state.
- *
- * In this state, the recorded audio data (from RAM) is saved to the SD card using SPI + FatFs.
- * Once the data is saved, the system transitions back to the IDLE state.
- */
-static void on_logging(void)
-{
-    // TODO: Implement saving of audio data to the SD card.
-
-    // After processing, return to the IDLE state.
-    application_state = IDLE;
-}
-
-/**
- * @brief Handles the USB_COMMAND state.
- *
- * Processes USB CDC commands (e.g., list files, send file, delete file).
- * After executing a command, the state transitions back to the IDLE state.
- */
-void on_usb_command(void) {
-    const char* cmd = usb_cdc_getCommand();
-
-    // --- Si estamos esperando validación RFID ---
-    if (sec_request.pending) {
-        debug_uart_print("COMMAND PENDING\r\n");
-        return; // NO BORRAR COMANDO TODAVÍA, esperá a resolver SECURITY
-    }
-
-    // --- Si SECURITY ya resolvió una solicitud anterior ---
-    if (sec_request.action != SECURITY_NONE) {
-        if (sec_request.result) {
-            if (sec_request.action == SECURITY_AUTHENTICATE) {
-                debug_uart_print("RFID autorizado correctamente para cambiar threshold\r\n");
-                debug_uart_print("Nuevo threshold aplicado (simulado)\r\n");
-            } else if (sec_request.action == SECURITY_REGISTER) {
-                debug_uart_print("Tarjeta registrada correctamente\r\n");
-            }
-        } else {
-            debug_uart_print("Acción cancelada: RFID no autorizado\r\n");
-        }
-
-        sec_request.action = SECURITY_NONE;
-        sec_request.pending = false;
-        application_state = IDLE;
-        usb_cdc_clearCommand();
+    if (delayRead(&measureDelay)) {
+        application_state = STATE_MONITORING;
         return;
     }
+    if (usb_commands_pending()) {
+        application_state = STATE_USB_COMMAND;
+        return;
+    }
+}
 
-    // --- Procesar comando recibido ---
-    if (strcmp(cmd, USB_CMD_LED_ON) == 0) {
-        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-        debug_uart_print("LED encendido\r\n");
-        application_state = IDLE;
+//─── Monitoring: show & log high events ──────────────────────────────────────
+static void on_monitoring(void)
+{
+    char buf[64];
+    sprintf(buf, "ENV = %u counts\r\n", envelope);
+    debug_uart_print(buf);
 
-    } else if (strcmp(cmd, USB_CMD_LED_OFF) == 0) {
-        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-        debug_uart_print("LED apagado\r\n");
-        application_state = IDLE;
-
-    } else if (strcmp(cmd, USB_CMD_CHANGE_THRESHOLD) == 0) {
-        debug_uart_print("Requiere autenticación para cambiar threshold\r\n");
-        sec_request.action = SECURITY_AUTHENTICATE;
-        sec_request.pending = true;
-        application_state = SECURITY;
-
-    } else if (strcmp(cmd, USB_COMMAND_REGISTER_RFID) == 0) {
-        debug_uart_print("Registrar tarjeta\r\n");
-        sec_request.action = SECURITY_REGISTER;
-        sec_request.pending = true;
-        application_state = SECURITY;
-
-    } else {
-        debug_uart_print("Comando desconocido\r\n");
+    if (envelope < threshold_low) {
+        // TODO: turn off all 6 LEDs
+    }
+    else if (envelope < threshold_high) {
+        // TODO: light 2 LEDs proportional to (envelope - low)/(high - low)
+    }
+    else {
+        // TODO: light all 6 LEDs
+        // log timestamp
+        rtc_datetime_t now;
+        if (rtc_get_datetime(&now)) {
+            eeprom_log_high_event((eeprom_log_entry_t*)&now);
+        }
     }
 
-    usb_cdc_clearCommand();
+    // restart 1 s and go back
+    delayWrite(&measureDelay, 1000);
+    application_state = STATE_IDLE;
 }
 
-
-void on_security(void) {
-	    // Si no hay pedido pendiente, salir
-	    if (!sec_request.pending) {
-	    	application_state = IDLE;
-	        return;
-	    }
-
-	    // Buffer para UID leído
-	    uint8_t uid[10];
-	    size_t uid_len = 0;
-
-	    // Intentar leer tarjeta
-	    if (!rfid_read_uid(uid, &uid_len)) {
-	        debug_uart_print("Fallo al leer tarjeta RFID\r\n");
-	        sec_request.result = false;
-	    } else {
-	        switch (sec_request.action) {
-	            case SECURITY_REGISTER:
-	                sec_request.result = rfid_register_card(uid, uid_len);
-	                if (sec_request.result) {
-	                    debug_uart_print("Tarjeta registrada con éxito\r\n");
-	                } else {
-	                    debug_uart_print("Error al registrar tarjeta (ya existe?)\r\n");
-	                }
-	                break;
-
-	            case SECURITY_AUTHENTICATE:
-	                sec_request.result = rfid_authenticate(uid, uid_len);
-	                if (sec_request.result) {
-	                    debug_uart_print("RFID autorizado\r\n");
-	                    // TODO: realizar la acción original (ej: cambiar thresholds)
-	                } else {
-	                    debug_uart_print("RFID no autorizado\r\n");
-	                }
-	                break;
-
-	            default:
-	                // Seguridad sin acción válida
-	                break;
-	        }
-	    }
-
-	    // Limpiar solicitud y volver a IDLE
-	    sec_request.pending = false;
-	    sec_request.action = SECURITY_NONE;
-	    application_state = IDLE;
-}
-
-/**
- * @brief Handles the ERROR state.
- *
- * In case of errors (e.g., SD initialization failure, DMA error), the system enters
- * the ERROR state and can provide visual or debugging cues.
- */
-static void on_app_error(void)
+//─── USB Command handler ─────────────────────────────────────────────────────
+static void on_usb_command(void)
 {
-    // TODO: Implement error handling (e.g., blink an LED to indicate error).
+    usb_command_t cmd = usb_commands_get(&pending_action);
+    switch (cmd) {
+        case CMD_GET_THRESH: {
+            char msg[64];
+            sprintf(msg, "TH_LOW=%u TH_HIGH=%u\r\n",
+                    threshold_low, threshold_high);
+            debug_uart_print(msg);
+            break;
+        }
+        case CMD_SET_THRESH: {
+            if (eeprom_write_thresholds(pending_action.low,
+                                        pending_action.high))
+            {
+                threshold_low  = pending_action.low;
+                threshold_high = pending_action.high;
+                debug_uart_print("Thresholds updated\r\n");
+            } else {
+                debug_uart_print("EEPROM write error\r\n");
+            }
+            break;
+        }
+        case CMD_GET_TIME: {
+            rtc_datetime_t dt;
+            if (rtc_get_datetime(&dt)) {
+                char msg[64];
+                sprintf(msg, "%02u/%02u/20%02u %02u:%02u:%02u\r\n",
+                        dt.date, dt.month, dt.year,
+                        dt.hour, dt.min, dt.sec);
+                debug_uart_print(msg);
+            } else {
+                debug_uart_print("RTC: ND\r\n");
+            }
+            break;
+        }
+        case CMD_SET_TIME: {
+            if (rtc_set_datetime(&pending_action.dt)) {
+                debug_uart_print("RTC updated\r\n");
+            } else {
+                debug_uart_print("RTC write error\r\n");
+            }
+            break;
+        }
+        case CMD_GET_LOG: {
+            eeprom_log_entry_t entries[EEPROM_LOG_MAX_ENTRIES];
+            uint8_t count;
+            if (eeprom_read_log(entries,
+                                EEPROM_LOG_MAX_ENTRIES,
+                                &count))
+            {
+                for (uint8_t i = 0; i < count; i++) {
+                    char msg[64];
+                    sprintf(msg,
+                            "%02u/%02u/20%02u %02u:%02u:%02u Lvl=%u\r\n",
+                            entries[i].date,
+                            entries[i].month,
+                            entries[i].year,
+                            entries[i].hour,
+                            entries[i].minute,
+                            entries[i].second,
+                            entries[i].level);
+                    debug_uart_print(msg);
+                }
+            } else {
+                debug_uart_print("Log empty or error\r\n");
+            }
+            break;
+        }
+        case CMD_HELP:
+        default:
+            usb_commands_print_help();
+            break;
+    }
+    application_state = STATE_IDLE;
+}
+
+//─── Main loop ───────────────────────────────────────────────────────────────
+void app_entry_point(void)
+{
     while (1) {
-        // Stay here to indicate an error condition.
+        switch (application_state) {
+            case STATE_INITIALIZING: on_initializing();   break;
+            case STATE_IDLE:         on_idle();           break;
+            case STATE_MONITORING:   on_monitoring();     break;
+            case STATE_USB_COMMAND:  on_usb_command();    break;
+        }
     }
 }

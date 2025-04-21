@@ -5,13 +5,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Proyecto/drivers/usb_cdc/usb_cdc.c 
+../Proyecto/drivers/usb_cdc/usb_cdc.c \
+../Proyecto/drivers/usb_cdc/usb_commands.c 
 
 OBJS += \
-./Proyecto/drivers/usb_cdc/usb_cdc.o 
+./Proyecto/drivers/usb_cdc/usb_cdc.o \
+./Proyecto/drivers/usb_cdc/usb_commands.o 
 
 C_DEPS += \
-./Proyecto/drivers/usb_cdc/usb_cdc.d 
+./Proyecto/drivers/usb_cdc/usb_cdc.d \
+./Proyecto/drivers/usb_cdc/usb_commands.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -21,7 +24,7 @@ Proyecto/drivers/usb_cdc/%.o Proyecto/drivers/usb_cdc/%.su Proyecto/drivers/usb_
 clean: clean-Proyecto-2f-drivers-2f-usb_cdc
 
 clean-Proyecto-2f-drivers-2f-usb_cdc:
-	-$(RM) ./Proyecto/drivers/usb_cdc/usb_cdc.cyclo ./Proyecto/drivers/usb_cdc/usb_cdc.d ./Proyecto/drivers/usb_cdc/usb_cdc.o ./Proyecto/drivers/usb_cdc/usb_cdc.su
+	-$(RM) ./Proyecto/drivers/usb_cdc/usb_cdc.cyclo ./Proyecto/drivers/usb_cdc/usb_cdc.d ./Proyecto/drivers/usb_cdc/usb_cdc.o ./Proyecto/drivers/usb_cdc/usb_cdc.su ./Proyecto/drivers/usb_cdc/usb_commands.cyclo ./Proyecto/drivers/usb_cdc/usb_commands.d ./Proyecto/drivers/usb_cdc/usb_commands.o ./Proyecto/drivers/usb_cdc/usb_commands.su
 
 .PHONY: clean-Proyecto-2f-drivers-2f-usb_cdc
 
