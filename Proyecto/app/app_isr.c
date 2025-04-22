@@ -49,22 +49,27 @@ void app_isr_button_handler(void)
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-    if (hadc->Instance == ADC1) {
-        // 1) Compute DC bias
-        uint32_t sum = 0;
-        for (int i = 0; i < ADC_BUFFER_SIZE; i++) {
-            sum += adc_dma_buffer[i];
-        }
-        uint16_t bias = sum / ADC_BUFFER_SIZE;
+    if (hadc->Instance != ADC1) return;
 
-        // 2) Compute mean absolute deviation (“envelope”)
-        uint32_t abs_sum = 0;
-        for (int i = 0; i < ADC_BUFFER_SIZE; i++) {
-            int32_t d = (int32_t)adc_dma_buffer[i] - (int32_t)bias;
-            abs_sum += (d < 0 ? -d : d);
-        }
-        envelope = abs_sum / ADC_BUFFER_SIZE;
+    // 1) Compute DC bias
+    uint32_t sum = 0;
+    for (int i = 0; i < ADC_BUFFER_SIZE; i++) {
+        sum += adc_dma_buffer[i];
     }
+    float bias = (float)sum / (float)ADC_BUFFER_SIZE;
+
+    // 2) Compute sum of squares around the bias
+    uint32_t sum_sq = 0;
+    for (int i = 0; i < ADC_BUFFER_SIZE; i++) {
+        float d = (float)adc_dma_buffer[i] - bias;
+        sum_sq += (uint32_t)(d * d);
+    }
+
+    // 3) RMS = sqrt(mean of squares)
+    float rms = sqrtf((float)sum_sq / (float)ADC_BUFFER_SIZE);
+
+    // 4) Store raw RMS as your new envelope
+    envelope = rms;
 }
 
 

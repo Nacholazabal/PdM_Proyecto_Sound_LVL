@@ -1,4 +1,0 @@
-../Proyecto/drivers/rfid/rfid.c:8:6:rfid_init	1
-../Proyecto/drivers/rfid/rfid.c:12:6:rfid_read_uid	1
-../Proyecto/drivers/rfid/rfid.c:16:6:rfid_register_card	3
-../Proyecto/drivers/rfid/rfid.c:24:6:rfid_authenticate	4

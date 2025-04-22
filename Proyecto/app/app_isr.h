@@ -11,7 +11,7 @@
 #define APP_ISR_H
 #include <stdint.h>
 #include <stdbool.h>
-
+#include <math.h>
 #define ADC_BUFFER_SIZE 256
 
 extern uint16_t          adc_dma_buffer[ADC_BUFFER_SIZE];

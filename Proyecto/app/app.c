@@ -1,4 +1,5 @@
 // app.c
+#include <ports/port_ble/port_ble.h>
 #include "stm32f4xx_hal.h"
 #include "main.h"
 #include "app.h"
@@ -12,6 +13,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "port_ble.h"
 
 typedef enum {
     STATE_INITIALIZING,
@@ -52,7 +54,7 @@ static void on_initializing(void)
     // start a 1 s non‑blocking delay
     delayInit(&measureDelay, 1000);
     debug_uart_print("INIT: drivers initialized\r\n");
-
+    port_ble_init();
     application_state = STATE_IDLE;
 }
 
@@ -72,34 +74,60 @@ static void on_idle(void)
 //─── Monitoring: show & log high events ──────────────────────────────────────
 static void on_monitoring(void)
 {
-    char buf[64];
-    sprintf(buf, "ENV = %u counts\r\n", envelope);
+    char buf[80];
+
+    // 0) Entry trace
+    debug_uart_print("=== ENTER MONITORING ===\r\n");
+
+    // 1) Print the raw envelope value
+    //    (you may want to cast or format as integer or float)
+    sprintf(buf, "DBG: Envelope = %u\r\n", envelope);
     debug_uart_print(buf);
 
-    if (envelope < threshold_low) {
-        // TODO: turn off all 6 LEDs
+    // 2) Classify and report
+    if (envelope <= threshold_low) {
+        debug_uart_print("DBG: Classification → LOW NOISE\r\n");
+        port_ble_sendString("LOW NOISE\r\n");
     }
     else if (envelope < threshold_high) {
-        // TODO: light 2 LEDs proportional to (envelope - low)/(high - low)
+        debug_uart_print("DBG: Classification → MEDIUM NOISE\r\n");
+        port_ble_sendString("MEDIUM NOISE\r\n");
     }
     else {
-        // TODO: light all 6 LEDs
-        // log timestamp
-    	rtc_datetime_t dt;
-    	if (rtc_get_datetime(&dt)) {
-    	    eeprom_log_entry_t entry;
-    	    entry.year   = dt.year;
-    	    entry.month  = dt.month;
-    	    entry.day    = dt.date;
-    	    entry.hour   = dt.hour;
-    	    entry.minute = dt.min;
-    	    entry.second = dt.sec;
-    	    entry.level  = envelope;
-    	    eeprom_log_high_event(&entry);
-    	}
+        debug_uart_print("DBG: Classification → HIGH NOISE\r\n");
+        port_ble_sendString("HIGH NOISE\r\n");
+
+        // 3) Log high‑noise event
+        rtc_datetime_t dt;
+        if (rtc_get_datetime(&dt)) {
+            // Debug‑print timestamp + level
+            sprintf(buf,
+                    "DBG: Logging @ %02u/%02u/20%02u %02u:%02u:%02u, lvl=%u\r\n",
+                    dt.day, dt.month, dt.year,
+                    dt.hour, dt.min, dt.sec,
+                    envelope);
+            debug_uart_print(buf);
+
+            // Prepare entry (level as integer)
+            eeprom_log_entry_t entry = {
+                .year   = dt.year,
+                .month  = dt.month,
+                .day    = dt.day,
+                .hour   = dt.hour,
+                .minute = dt.min,
+                .second = dt.sec,
+                .level  = (uint16_t)envelope
+            };
+            eeprom_log_high_event(&entry);
+        } else {
+            debug_uart_print("DBG: RTC read failed, skipping log\r\n");
+        }
     }
 
-    // restart 1 s and go back
+    // 4) Exit trace
+    debug_uart_print("=== EXIT MONITORING ===\r\n");
+
+    // 5) Restart 1 s timer & go back to IDLE
     delayWrite(&measureDelay, 1000);
     application_state = STATE_IDLE;
 }
