@@ -1,6 +1,5 @@
 // app.c
-#include <bt.h>
-#include <ports/port_bt/port_bt.h>
+#include "bt.h"
 #include "stm32f4xx_hal.h"
 #include "main.h"
 #include "app.h"
@@ -10,6 +9,7 @@
 #include "eeprom.h"
 #include "rtc.h"
 #include "debug_uart.h"
+#include "button.h"
 #include "API_delay.h"
 #include <stdio.h>
 #include <stdbool.h>
@@ -60,6 +60,17 @@ static void on_initializing(void)
 //─── Idle: wait for timeout or USB ────────────────────────────────────────────
 static void on_idle(void)
 {
+    button_update();
+
+    if (button_was_long_pressed()) {
+        eeprom_erase_log();
+        usb_cdc_sendString("EEPROM logs erased.\r\n");
+    }
+    else if (button_was_pressed()) {
+        eeprom_restore_defaults();
+        usb_cdc_sendString("Thresholds restored to defaults.\r\n");
+    }
+
     if (delayRead(&measureDelay)) {
         application_state = STATE_MONITORING;
         return;

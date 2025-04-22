@@ -1,0 +1,2 @@
+../Proyecto/drivers/bt/Src/port_bt.c:7:6:port_bt_init	1
+../Proyecto/drivers/bt/Src/port_bt.c:11:6:port_bt_send	1

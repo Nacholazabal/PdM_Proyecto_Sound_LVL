@@ -1,0 +1,2 @@
+../Proyecto/drivers/uart/Src/port_debug_uart.c:7:6:port_debug_uart_init	1
+../Proyecto/drivers/uart/Src/port_debug_uart.c:11:6:port_debug_uart_send	1

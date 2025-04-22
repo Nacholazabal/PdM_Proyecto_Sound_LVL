@@ -1,3 +1,0 @@
-../Proyecto/drivers/uart/debug_uart.c:5:6:debug_uart_init	8	static
-../Proyecto/drivers/uart/debug_uart.c:9:6:debug_uart_print	16	static
-../Proyecto/drivers/uart/debug_uart.c:13:6:debug_uart_send_raw	16	static

@@ -1,5 +1,0 @@
-../Proyecto/drivers/usb_cdc/usb_commands.c:8:6:usb_commands_init	1
-../Proyecto/drivers/usb_cdc/usb_commands.c:13:6:usb_commands_pending	1
-../Proyecto/drivers/usb_cdc/usb_commands.c:17:13:parse_settime_args	2
-../Proyecto/drivers/usb_cdc/usb_commands.c:35:15:usb_commands_get	7
-../Proyecto/drivers/usb_cdc/usb_commands.c:74:6:usb_commands_print_help	1

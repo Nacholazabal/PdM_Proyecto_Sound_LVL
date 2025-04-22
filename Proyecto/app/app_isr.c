@@ -8,7 +8,7 @@
 
 #include "app_isr.h"
 #include "button.h"
-#include "port_button.h"  // This should define BUTTON_PIN
+#include "port_button.h"
 #include "app.h"
 #include "debug_uart.h"
 

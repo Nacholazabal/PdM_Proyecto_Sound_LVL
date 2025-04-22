@@ -1,0 +1,4 @@
+../Proyecto/drivers/button/Src/button.c:16:6:button_init	1
+../Proyecto/drivers/button/Src/button.c:23:6:button_update	14
+../Proyecto/drivers/button/Src/button.c:77:8:button_was_pressed	2
+../Proyecto/drivers/button/Src/button.c:85:8:button_was_long_pressed	2

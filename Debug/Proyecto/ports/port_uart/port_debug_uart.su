@@ -1,2 +1,0 @@
-../Proyecto/ports/port_uart/port_debug_uart.c:7:6:port_debug_uart_init	8	static
-../Proyecto/ports/port_uart/port_debug_uart.c:11:6:port_debug_uart_send	16	static

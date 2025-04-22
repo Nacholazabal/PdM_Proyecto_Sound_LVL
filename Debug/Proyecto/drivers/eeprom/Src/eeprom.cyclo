@@ -1,0 +1,7 @@
+../Proyecto/drivers/eeprom/Src/eeprom.c:8:6:eeprom_init	6
+../Proyecto/drivers/eeprom/Src/eeprom.c:43:6:eeprom_read_thresholds	2
+../Proyecto/drivers/eeprom/Src/eeprom.c:56:6:eeprom_write_thresholds	1
+../Proyecto/drivers/eeprom/Src/eeprom.c:66:6:eeprom_log_high_event	5
+../Proyecto/drivers/eeprom/Src/eeprom.c:103:6:eeprom_read_log	8
+../Proyecto/drivers/eeprom/Src/eeprom.c:139:6:eeprom_erase_log	2
+../Proyecto/drivers/eeprom/Src/eeprom.c:163:6:eeprom_restore_defaults	2
