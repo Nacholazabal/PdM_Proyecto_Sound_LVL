@@ -1,5 +1,6 @@
 // app.c
-#include <ports/port_ble/port_ble.h>
+#include <bt.h>
+#include <ports/port_bt/port_bt.h>
 #include "stm32f4xx_hal.h"
 #include "main.h"
 #include "app.h"
@@ -13,7 +14,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "port_ble.h"
 
 typedef enum {
     STATE_INITIALIZING,
@@ -41,7 +41,7 @@ static void on_initializing(void)
     usb_commands_init();
     eeprom_init();
     rtc_init();
-
+    bt_init();
     // load or default thresholds
     eeprom_read_thresholds(&threshold_low, &threshold_high);
 
@@ -54,7 +54,6 @@ static void on_initializing(void)
     // start a 1 s non‑blocking delay
     delayInit(&measureDelay, 1000);
     debug_uart_print("INIT: drivers initialized\r\n");
-    port_ble_init();
     application_state = STATE_IDLE;
 }
 
@@ -87,15 +86,15 @@ static void on_monitoring(void)
     // 2) Classify and report
     if (envelope <= threshold_low) {
         debug_uart_print("DBG: Classification → LOW NOISE\r\n");
-        port_ble_sendString("LOW NOISE\r\n");
+        bt_send("LOW NOISE\r\n");
     }
     else if (envelope < threshold_high) {
         debug_uart_print("DBG: Classification → MEDIUM NOISE\r\n");
-        port_ble_sendString("MEDIUM NOISE\r\n");
+        bt_send("MEDIUM NOISE\r\n");
     }
     else {
         debug_uart_print("DBG: Classification → HIGH NOISE\r\n");
-        port_ble_sendString("HIGH NOISE\r\n");
+        bt_send("HIGH NOISE\r\n");
 
         // 3) Log high‑noise event
         rtc_datetime_t dt;

@@ -1,2 +1,0 @@
-../Proyecto/ports/port_ble/port_ble.c:8:6:port_ble_init	1
-../Proyecto/ports/port_ble/port_ble.c:15:6:port_ble_sendString	1

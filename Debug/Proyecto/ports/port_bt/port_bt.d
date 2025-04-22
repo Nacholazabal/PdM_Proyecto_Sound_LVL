@@ -1,5 +1,5 @@
-Proyecto/ports/port_ble/port_ble.o: ../Proyecto/ports/port_ble/port_ble.c \
- ../Proyecto/ports/port_ble/port_ble.h \
+Proyecto/ports/port_bt/port_bt.o: ../Proyecto/ports/port_bt/port_bt.c \
+ ../Proyecto/ports/port_bt/port_bt.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -37,7 +37,7 @@ Proyecto/ports/port_ble/port_ble.o: ../Proyecto/ports/port_ble/port_ble.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h \
  ../Core/Inc/main.h
-../Proyecto/ports/port_ble/port_ble.h:
+../Proyecto/ports/port_bt/port_bt.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
