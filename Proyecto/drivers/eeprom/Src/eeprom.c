@@ -46,7 +46,7 @@ bool eeprom_read_thresholds(uint16_t *low, uint16_t *high)
     if (!eeprom_read(EEPROM_THRESH_ADDR, buf, sizeof(buf))) {
         return false;
     }
-    // Little‑endian unpack
+    // Little endian unpack
     *low  = (uint16_t)buf[0] | ((uint16_t)buf[1] << 8);
     *high = (uint16_t)buf[2] | ((uint16_t)buf[3] << 8);
     return true;
@@ -70,15 +70,16 @@ bool eeprom_log_high_event(const eeprom_log_entry_t *evt)
     // 1) Read HEAD & COUNT
     eeprom_read(EEPROM_LOG_HEAD_ADDR,  &head,  1);
     eeprom_read(EEPROM_LOG_COUNT_ADDR, &count, 1);
+    // Ver si se corrompieron
     if (head  >= EEPROM_LOG_MAX_ENTRIES) head  = 0;
     if (count >  EEPROM_LOG_MAX_ENTRIES) count = 0;
 
-    // 2) Bump COUNT (cap at max)
+    // 2)  Si todavía no llenamos el log, incrementamos count. Si ya está lleno, lo dejamos igual (el nuevo evento sobrescribirá el más antiguo).
     if (count < EEPROM_LOG_MAX_ENTRIES) {
         count++;
     }
 
-    // 3) Write the new entry at slot ‘head’
+    // 3) Calculamos la dirección de memoria donde guardar el nuevo evento, dependiendo de la posición head.
     uint16_t slot_addr = EEPROM_LOG_ENTRY_ADDR
                        + (uint16_t)head * EEPROM_LOG_ENTRY_SIZE;
     if (!eeprom_write(slot_addr, (uint8_t*)evt, EEPROM_LOG_ENTRY_SIZE)) {

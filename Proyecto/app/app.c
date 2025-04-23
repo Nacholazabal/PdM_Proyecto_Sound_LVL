@@ -51,7 +51,7 @@ static void on_initializing(void)
                       (uint32_t*)adc_dma_buffer,
                       ADC_BUFFER_SIZE);
 
-    // start a 1 s non‑blocking delay
+    // start a 1s non blocking delay
     delayInit(&measureDelay, 1000);
     debug_uart_print("INIT: drivers initialized\r\n");
     application_state = STATE_IDLE;

@@ -36,12 +36,13 @@ void usb_cdc_receiveCallback(uint8_t *Buf, uint32_t Len) {
 	debug_uart_print("usb_cdc_receiveCallback()\r\n");
 	debug_uart_print((char*) Buf);
 	debug_uart_print("\r\n");
+	//Trims newline (\n) and carriage return (\r) characters at the end of the string. This is common in terminal input from a PC.
 	while (Len > 0 && (Buf[Len - 1] == '\r' || Buf[Len - 1] == '\n')) {
 		Len--;
 	}
 	if (!command_pending && Len < USB_CMD_BUFFER_SIZE) {
 		memcpy(usb_cmd_buffer, Buf, Len);
-		// Null-terminate the string safely.
+		//Ensures the buffer is null-terminated to make it a valid C string, even if somehow the length matches the buffer size.
 		usb_cmd_buffer[Len < USB_CMD_BUFFER_SIZE ? Len : USB_CMD_BUFFER_SIZE - 1] =
 				'\0';
 		command_pending = true;
