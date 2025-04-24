@@ -1,6 +1,6 @@
-../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:21:6:usb_cdc_init	1
-../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:35:6:usb_cdc_receiveCallback	6
-../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:57:6:usb_cdc_isCommandPending	1
-../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:66:13:usb_cdc_getCommand	1
-../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:73:6:usb_cdc_clearCommand	1
-../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:86:5:usb_cdc_sendString	1
+../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:20:6:usb_cdc_init	1
+../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:25:6:usb_cdc_receiveCallback	6
+../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:47:6:usb_cdc_isCommandPending	1
+../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:51:13:usb_cdc_getCommand	1
+../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:55:6:usb_cdc_clearCommand	1
+../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:60:5:usb_cdc_sendString	1

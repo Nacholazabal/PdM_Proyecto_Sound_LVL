@@ -1,4 +1,4 @@
-../Proyecto/drivers/button/Src/button.c:16:6:button_init	8	static
-../Proyecto/drivers/button/Src/button.c:23:6:button_update	16	static
-../Proyecto/drivers/button/Src/button.c:77:8:button_was_pressed	4	static
-../Proyecto/drivers/button/Src/button.c:85:8:button_was_long_pressed	4	static
+../Proyecto/drivers/button/Src/button.c:29:6:button_init	8	static
+../Proyecto/drivers/button/Src/button.c:41:6:button_update	16	static
+../Proyecto/drivers/button/Src/button.c:94:8:button_was_pressed	4	static
+../Proyecto/drivers/button/Src/button.c:105:8:button_was_long_pressed	4	static

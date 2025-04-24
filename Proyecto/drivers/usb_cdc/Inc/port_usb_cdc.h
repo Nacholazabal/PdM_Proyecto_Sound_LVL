@@ -1,9 +1,9 @@
 /**
  * @file port_usb_cdc.h
- * @brief Hardware abstraction layer for USB CDC functions.
+ * @brief Capa de abstracción de hardware para funciones USB CDC.
  *
- * This file declares the port-level functions that directly interact with the USB CDC middleware.
- * It encapsulates the lower-level HAL functions so that the high-level driver remains hardware independent.
+ * Este archivo declara las funciones de bajo nivel que interactúan directamente con la interfaz USB CDC.
+ * Permite que el driver de alto nivel sea independiente del hardware y de la implementación HAL.
  */
 
 #ifndef PORT_USB_CDC_H
@@ -12,24 +12,14 @@
 #include <stdint.h>
 
 /**
- * @brief Transmits data over USB CDC.
+ * @brief Transmite datos por la interfaz USB CDC.
  *
- * This function wraps the underlying USB CDC transmit function (e.g., CDC_Transmit_FS).
+ * Esta función encapsula la llamada a la función de transmisión de la HAL (por ejemplo, CDC_Transmit_FS).
  *
- * @param buf Pointer to the data buffer to transmit.
- * @param len Length in bytes of the data to transmit.
- * @return 0 if successful, non-zero otherwise.
+ * @param buf Puntero al buffer de datos a transmitir.
+ * @param len Cantidad de bytes a transmitir.
+ * @return 0 si la transmisión fue exitosa, distinto de 0 en caso de error.
  */
 int port_usb_cdc_transmit(const uint8_t *buf, uint16_t len);
-
-/**
- * @brief Registers a receive callback.
- *
- * This function allows the high-level USB CDC driver to be notified when data is received.
- * The callback will be invoked from within the USB middleware receive routine.
- *
- * @param callback A pointer to a function that accepts a buffer and its length.
- */
-void port_usb_cdc_register_receive_callback(void (*callback)(uint8_t*, uint32_t));
 
 #endif // PORT_USB_CDC_H

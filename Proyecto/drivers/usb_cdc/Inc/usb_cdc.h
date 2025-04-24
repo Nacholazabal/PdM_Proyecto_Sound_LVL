@@ -1,10 +1,10 @@
 /**
  * @file usb_cdc.h
- * @brief High-level USB CDC driver interface.
+ * @brief Módulo de alto nivel para comunicación USB CDC.
  *
- * This module provides an abstraction for USB CDC communication.
- * It manages the buffering of received commands and the transmission of data.
- * The implementation relies on the port layer (port_usb_cdc) for the actual USB transfers.
+ * Este módulo proporciona una abstracción para la comunicación USB CDC,
+ * gestionando el buffer de comandos recibidos y la transmisión de datos.
+ * La implementación depende de la capa port (port_usb_cdc) para la transferencia real.
  */
 
 #ifndef USB_CDC_H
@@ -13,56 +13,56 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-/** Maximum size of the received USB command buffer */
+/** Tamaño máximo del buffer de comando USB recibido */
 #define USB_CMD_BUFFER_SIZE 128
 
 /**
- * @brief Initializes the USB CDC driver.
+ * @brief Inicializa el driver USB CDC.
  *
- * This function resets the internal buffer and clears the command pending flag.
- * USB hardware initialization is assumed to be handled by CubeMX.
+ * Esta función limpia el buffer interno y reinicia la bandera de comando pendiente.
+ * Se asume que la inicialización del hardware USB ya fue hecha por CubeMX.
  */
 void usb_cdc_init(void);
 
 /**
- * @brief USB CDC receive callback.
+ * @brief Callback de recepción de datos USB CDC.
  *
- * This function should be called by the USB middleware's receive callback.
- * It stores the incoming data into an internal buffer and sets a flag indicating a pending command.
+ * Esta función debe ser llamada desde la función de recepción de la capa USB.
+ * Almacena los datos recibidos en un buffer interno y marca el comando como pendiente.
  *
- * @param Buf Pointer to the received data.
- * @param Len Length in bytes of the received data.
+ * @param Buf Puntero a los datos recibidos.
+ * @param Len Longitud en bytes de los datos.
  */
 void usb_cdc_receiveCallback(uint8_t* Buf, uint32_t Len);
 
 /**
- * @brief Checks whether a USB CDC command is pending.
+ * @brief Indica si hay un comando USB pendiente de ser procesado.
  *
- * @return true if a command has been received and not yet processed, false otherwise.
+ * @return true si se recibió un comando, false si no.
  */
 bool usb_cdc_isCommandPending(void);
 
 /**
- * @brief Retrieves the pending USB CDC command.
+ * @brief Devuelve el comando pendiente almacenado.
  *
- * @return Pointer to a null-terminated string containing the received command.
+ * @return Puntero a un string terminado en null con el comando recibido.
  */
 const char* usb_cdc_getCommand(void);
 
 /**
- * @brief Clears the pending USB CDC command flag and buffer.
+ * @brief Limpia el comando pendiente y el buffer.
  *
- * This should be called after the command has been processed.
+ * Debe llamarse luego de procesar el comando.
  */
 void usb_cdc_clearCommand(void);
 
 /**
- * @brief Sends a null-terminated string over USB CDC.
+ * @brief Envía un string por USB CDC.
  *
- * This function wraps the lower-level port function to transmit data.
+ * Esta función utiliza la función de transmisión de la capa port.
  *
- * @param str Pointer to the string to be sent.
- * @return 0 on success, non-zero on error.
+ * @param str Puntero al string null-terminado.
+ * @return 0 si fue exitoso, distinto de 0 si hubo error.
  */
 int usb_cdc_sendString(const char* str);
 
