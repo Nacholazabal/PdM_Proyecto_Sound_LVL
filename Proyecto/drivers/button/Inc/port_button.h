@@ -1,8 +1,8 @@
 /**
  * @file port_button.h
- * @brief Hardware abstraction layer for button reading.
+ * @brief Capa de abstracción de hardware para la lectura del botón.
  *
- * This file declares the function to read the physical state of the button.
+ * Este archivo declara la función que permite leer el estado físico del botón.
  */
 
 #ifndef PORT_BUTTON_H
@@ -14,15 +14,15 @@
 
 typedef bool bool_t;
 
-#define BUTTON_PORT         GPIOC       ///< Button port (e.g., blue user button)
-#define BUTTON_PIN          GPIO_PIN_13 ///< Button pin
+#define BUTTON_PORT         GPIOC       ///< Puerto del botón (ej. botón azul de usuario)
+#define BUTTON_PIN          GPIO_PIN_13 ///< Pin del botón
 
 /**
- * @brief Reads the physical state of the button.
+ * Lee el estado físico del botón.
  *
- * This function accesses the GPIO pin associated with the button and returns its state.
+ * Esta función accede al pin GPIO correspondiente al botón y devuelve su estado lógico.
  *
- * @return true if the button is pressed, false if released.
+ * @return true si el botón está presionado, false si está liberado.
  */
 bool_t port_button_read(void);
 

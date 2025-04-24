@@ -1,25 +1,29 @@
 /**
  * @file port_button.c
- * @brief Implementation of the hardware-specific functions for button input.
+ * @brief Implementación específica del hardware para la lectura del botón.
  *
- * This file contains the functions that directly interact with the STM32 HAL to read the
- * state of the button.
+ * Este archivo contiene la función que interactúa con HAL para leer el estado físico del botón.
  */
 
 #include "port_button.h"
 
-// Board configuration for the button.
-#define BUTTON_PULL_LOW     true        ///< true if the button is active-low
+// Configuración de la placa: el botón es activo en bajo
+#define BUTTON_PULL_LOW     true        ///< true si el botón es activo-bajo
 
 /**
- * @brief Reads the current state of the button.
+ * Lee el estado actual del botón.
  *
- * Uses HAL_GPIO_ReadPin to retrieve the button state. If the button is active-low,
- * the logic is inverted so that the function returns true when the button is pressed.
+ * Utiliza HAL_GPIO_ReadPin para leer el pin físico del botón. Si el botón es activo-bajo,
+ * invierte la lógica para que devuelva true cuando esté presionado.
  *
- * @return true if the button is pressed, false if released.
+ * @return true si el botón está presionado, false si está liberado.
  */
 bool_t port_button_read(void) {
+    // Leemos el estado lógico del pin del botón
     GPIO_PinState pin_state = HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN);
+
+    // Si el botón es activo-bajo (pull-down), consideramos presionado cuando el pin está en bajo (RESET)
+    // Si fuera activo-alto, consideraríamos presionado cuando el pin esté en alto (SET)
+    // El operador ternario permite devolver directamente true o false según esta lógica
     return BUTTON_PULL_LOW ? (pin_state == GPIO_PIN_RESET) : (pin_state == GPIO_PIN_SET);
 }

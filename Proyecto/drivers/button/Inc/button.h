@@ -1,10 +1,9 @@
 /**
  * @file button.h
- * @brief Public header for the button driver.
+ * @brief Módulo de manejo de botón con antirrebote
  *
- * This driver implements a debouncing state machine for a push button.
- * The main application can poll the flag provided by this driver to
- * detect a complete press-release cycle.
+ * Este driver implementa una máquina de estados para antirrebote
+ * y permite detectar eventos de pulsación corta y larga.
  */
 
 #ifndef BUTTON_H
@@ -14,28 +13,27 @@
 #include <stdint.h>
 
 typedef bool bool_t;
+
 /**
- * @brief Initializes the button driver and its debouncing state machine.
+ * Inicializa el módulo del botón y la máquina de estados de antirrebote.
  */
 void button_init(void);
 
 /**
- * @brief Updates the button state machine.
+ * Actualiza el estado del botón.
  *
- * This function should be called periodically (e.g., in the main loop)
- * to update the debouncing logic.
+ * Debe llamarse periódicamente desde el bucle principal.
  */
 void button_update(void);
 
 /**
- * @brief Checks if a full button press (press-release cycle) has been detected.
- *
- * This function returns true only once per complete press-release event.
- *
- * @return true if a valid button press cycle was detected, false otherwise.
+ * Devuelve true si se detectó un clic corto (presionar y soltar).
  */
 bool_t button_was_pressed(void);
 
-bool_t  button_was_long_pressed(void);
+/**
+ * Devuelve true si se detectó una pulsación larga.
+ */
+bool_t button_was_long_pressed(void);
 
 #endif // BUTTON_H
