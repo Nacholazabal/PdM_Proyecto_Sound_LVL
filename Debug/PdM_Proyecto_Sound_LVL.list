@@ -29,23 +29,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
  12 .comment      00000043  00000000  00000000  00020198  2**0
                   CONTENTS, READONLY
- 13 .debug_info   00020879  00000000  00000000  000201db  2**0
+ 13 .debug_info   000208a9  00000000  00000000  000201db  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 000056ea  00000000  00000000  00040a54  2**0
+ 14 .debug_abbrev 000056ea  00000000  00000000  00040a84  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_aranges 00001c08  00000000  00000000  00046140  2**3
+ 15 .debug_aranges 00001c08  00000000  00000000  00046170  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_rnglists 00001569  00000000  00000000  00047d48  2**0
+ 16 .debug_rnglists 00001569  00000000  00000000  00047d78  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_macro  0002a10b  00000000  00000000  000492b1  2**0
+ 17 .debug_macro  0002a10b  00000000  00000000  000492e1  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   00029b47  00000000  00000000  000733bc  2**0
+ 18 .debug_line   00029b47  00000000  00000000  000733ec  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000e73c3  00000000  00000000  0009cf03  2**0
+ 19 .debug_str    000e73c3  00000000  00000000  0009cf33  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .debug_frame  00007fc4  00000000  00000000  001842c8  2**2
+ 20 .debug_frame  00007fc4  00000000  00000000  001842f8  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 0000007d  00000000  00000000  0018c28c  2**0
+ 21 .debug_line_str 0000007d  00000000  00000000  0018c2bc  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -29249,7 +29249,7 @@ static void on_usb_command(void)
  800af3c:	0800affb 	.word	0x0800affb
  800af40:	0800b01d 	.word	0x0800b01d
         case CMD_GET_THRESH: {
-            snprintf(buf, sizeof(buf),
+            snprintf(buf, sizeof(buf), "TH_LOW=%u TH_HIGH=%u\r\n", threshold_low, threshold_high);
  800af44:	4b6e      	ldr	r3, [pc, #440]	; (800b100 <on_usb_command+0x1f8>)
  800af46:	881b      	ldrh	r3, [r3, #0]
  800af48:	461a      	mov	r2, r3
@@ -29261,8 +29261,6 @@ static void on_usb_command(void)
  800af56:	4a6c      	ldr	r2, [pc, #432]	; (800b108 <on_usb_command+0x200>)
  800af58:	2140      	movs	r1, #64	; 0x40
  800af5a:	f001 fe3d 	bl	800cbd8 <sniprintf>
-                     "TH_LOW=%u TH_HIGH=%u\r\n",
-                     threshold_low, threshold_high);
             usb_cdc_sendString(buf);
  800af5e:	f107 0360 	add.w	r3, r7, #96	; 0x60
  800af62:	4618      	mov	r0, r3
@@ -29689,7 +29687,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 /**
  * Inicializa el módulo Bluetooth llamando al port específico.
  */
-bool bt_init(void) {
+bool_t bt_init(void) {
  800b254:	b580      	push	{r7, lr}
  800b256:	af00      	add	r7, sp, #0
     return port_bt_init();
@@ -29705,7 +29703,7 @@ bool bt_init(void) {
  * Envía un string como mensaje Bluetooth usando la función raw.
  * Internamente convierte el string a un buffer de bytes.
  */
-bool bt_send(const char* msg) {
+bool_t bt_send(const char* msg) {
  800b262:	b580      	push	{r7, lr}
  800b264:	b082      	sub	sp, #8
  800b266:	af00      	add	r7, sp, #0
@@ -29729,7 +29727,7 @@ bool bt_send(const char* msg) {
 /**
  * Envía datos crudos por Bluetooth usando la función del port.
  */
-bool bt_send_raw(const uint8_t* data, size_t len) {
+bool_t bt_send_raw(const uint8_t* data, size_t len) {
  800b284:	b580      	push	{r7, lr}
  800b286:	b082      	sub	sp, #8
  800b288:	af00      	add	r7, sp, #0
@@ -29752,7 +29750,7 @@ bool bt_send_raw(const uint8_t* data, size_t len) {
  *
  * @return true si HAL_UART_Init devuelve HAL_OK
  */
-bool port_bt_init(void) {
+bool_t port_bt_init(void) {
  800b2a0:	b580      	push	{r7, lr}
  800b2a2:	af00      	add	r7, sp, #0
     return HAL_UART_Init(&huart1) == HAL_OK;
@@ -29776,7 +29774,7 @@ bool port_bt_init(void) {
  * @param len Cantidad de bytes del buffer.
  * @return true si la transmisión fue exitosa.
  */
-bool port_bt_send(const uint8_t* data, size_t len) {
+bool_t port_bt_send(const uint8_t* data, size_t len) {
  800b2c0:	b580      	push	{r7, lr}
  800b2c2:	b082      	sub	sp, #8
  800b2c4:	af00      	add	r7, sp, #0
@@ -30084,7 +30082,7 @@ bool_t port_button_read(void) {
 #include "port_eeprom.h"
 
 // ─── Inicialización de EEPROM ─────────────────────────────────────────────
-bool eeprom_init(void)
+bool_t eeprom_init(void)
 {
  800b480:	b580      	push	{r7, lr}
  800b482:	b084      	sub	sp, #16
@@ -30192,7 +30190,7 @@ bool eeprom_init(void)
 0800b51e <eeprom_read_thresholds>:
 
 // ─── Leer thresholds LOW y HIGH ───────────────────────────────────────────
-bool eeprom_read_thresholds(uint16_t *low, uint16_t *high)
+bool_t eeprom_read_thresholds(uint16_t *low, uint16_t *high)
 {
  800b51e:	b580      	push	{r7, lr}
  800b520:	b084      	sub	sp, #16
@@ -30249,7 +30247,7 @@ bool eeprom_read_thresholds(uint16_t *low, uint16_t *high)
 0800b578 <eeprom_write_thresholds>:
 
 // ─── Escribir nuevos thresholds ───────────────────────────────────────────
-bool eeprom_write_thresholds(uint16_t low, uint16_t high)
+bool_t eeprom_write_thresholds(uint16_t low, uint16_t high)
 {
  800b578:	b580      	push	{r7, lr}
  800b57a:	b084      	sub	sp, #16
@@ -30296,7 +30294,7 @@ bool eeprom_write_thresholds(uint16_t low, uint16_t high)
 0800b5c0 <eeprom_log_high_event>:
 
 // ─── Guardar nuevo evento de ruido alto ───────────────────────────────────
-bool eeprom_log_high_event(const eeprom_log_entry_t *evt)
+bool_t eeprom_log_high_event(const eeprom_log_entry_t *evt)
 {
  800b5c0:	b580      	push	{r7, lr}
  800b5c2:	b08c      	sub	sp, #48	; 0x30
@@ -30430,7 +30428,7 @@ bool eeprom_log_high_event(const eeprom_log_entry_t *evt)
 0800b6b4 <eeprom_read_log>:
 
 // ─── Leer los últimos eventos registrados ────────────────────────────────
-bool eeprom_read_log(eeprom_log_entry_t *entries,
+bool_t eeprom_read_log(eeprom_log_entry_t *entries,
                      uint8_t max_entries,
                      uint8_t *out_count)
 {
@@ -30661,7 +30659,7 @@ void eeprom_erase_log(void)
 0800b814 <eeprom_restore_defaults>:
 
 // ─── Restaurar los thresholds por defecto ────────────────────────────────
-bool eeprom_restore_defaults(void)
+bool_t eeprom_restore_defaults(void)
 {
  800b814:	b580      	push	{r7, lr}
  800b816:	af00      	add	r7, sp, #0
@@ -30681,7 +30679,7 @@ bool eeprom_restore_defaults(void)
 /**
  * Lee datos desde la EEPROM por I2C.
  */
-bool eeprom_read(uint16_t mem_addr, uint8_t *data, uint16_t len)
+bool_t eeprom_read(uint16_t mem_addr, uint8_t *data, uint16_t len)
 {
  800b828:	b580      	push	{r7, lr}
  800b82a:	b086      	sub	sp, #24
@@ -30728,7 +30726,7 @@ bool eeprom_read(uint16_t mem_addr, uint8_t *data, uint16_t len)
  *
  * Luego de escribir, espera al menos 6 ms para completar el ciclo interno de escritura.
  */
-bool eeprom_write(uint16_t mem_addr, const uint8_t *data, uint16_t len)
+bool_t eeprom_write(uint16_t mem_addr, const uint8_t *data, uint16_t len)
 {
  800b86c:	b580      	push	{r7, lr}
  800b86e:	b086      	sub	sp, #24

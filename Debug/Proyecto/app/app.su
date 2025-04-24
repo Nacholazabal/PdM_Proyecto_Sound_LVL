@@ -2,4 +2,4 @@
 ../Proyecto/app/app.c:98:13:on_idle	8	static
 ../Proyecto/app/app.c:128:13:on_monitoring	144	static
 ../Proyecto/app/app.c:182:13:on_usb_command	224	static
-../Proyecto/app/app.c:265:6:appUpdate	8	static
+../Proyecto/app/app.c:263:6:appUpdate	8	static

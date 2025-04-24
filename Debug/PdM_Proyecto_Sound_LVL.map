@@ -8999,7 +8999,7 @@ LOAD C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .comment       0x0000000000000043       0x44 ./USB_DEVICE/App/usbd_desc.o
  .comment       0x0000000000000043       0x44 ./USB_DEVICE/Target/usbd_conf.o
 
-.debug_info     0x0000000000000000    0x20879
+.debug_info     0x0000000000000000    0x208a9
  .debug_info    0x0000000000000000     0x1970 ./Core/Src/main.o
  .debug_info    0x0000000000001970     0x165d ./Core/Src/stm32f4xx_hal_msp.o
  .debug_info    0x0000000000002fcd      0xb64 ./Core/Src/stm32f4xx_it.o
@@ -9028,24 +9028,24 @@ LOAD C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .debug_info    0x0000000000018bd8      0x27e ./Proyecto/API/Src/API_delay.o
  .debug_info    0x0000000000018e56      0xf29 ./Proyecto/app/app.o
  .debug_info    0x0000000000019d7f      0x6c1 ./Proyecto/app/app_isr.o
- .debug_info    0x000000000001a440      0x16e ./Proyecto/drivers/bt/Src/bt.o
- .debug_info    0x000000000001a5ae      0x649 ./Proyecto/drivers/bt/Src/port_bt.o
- .debug_info    0x000000000001abf7      0x212 ./Proyecto/drivers/button/Src/button.o
- .debug_info    0x000000000001ae09      0x1c7 ./Proyecto/drivers/button/Src/port_button.o
- .debug_info    0x000000000001afd0      0x481 ./Proyecto/drivers/eeprom/Src/eeprom.o
- .debug_info    0x000000000001b451      0x72a ./Proyecto/drivers/eeprom/Src/port_eeprom.o
- .debug_info    0x000000000001bb7b      0x72a ./Proyecto/drivers/rtc/Src/port_rtc.o
- .debug_info    0x000000000001c2a5      0x275 ./Proyecto/drivers/rtc/Src/rtc.o
- .debug_info    0x000000000001c51a      0x16e ./Proyecto/drivers/uart/Src/debug_uart.o
- .debug_info    0x000000000001c688      0x649 ./Proyecto/drivers/uart/Src/port_debug_uart.o
- .debug_info    0x000000000001ccd1      0x10a ./Proyecto/drivers/usb_cdc/Src/port_usb_cdc.o
- .debug_info    0x000000000001cddb      0x26e ./Proyecto/drivers/usb_cdc/Src/usb_cdc.o
- .debug_info    0x000000000001d049      0x374 ./Proyecto/drivers/usb_cdc/Src/usb_commands.o
- .debug_info    0x000000000001d3bd       0x8b ./Proyecto/proyecto.o
- .debug_info    0x000000000001d448      0x70e ./USB_DEVICE/App/usb_device.o
- .debug_info    0x000000000001db56      0x91e ./USB_DEVICE/App/usbd_cdc_if.o
- .debug_info    0x000000000001e474      0x4ba ./USB_DEVICE/App/usbd_desc.o
- .debug_info    0x000000000001e92e     0x1f4b ./USB_DEVICE/Target/usbd_conf.o
+ .debug_info    0x000000000001a440      0x17a ./Proyecto/drivers/bt/Src/bt.o
+ .debug_info    0x000000000001a5ba      0x655 ./Proyecto/drivers/bt/Src/port_bt.o
+ .debug_info    0x000000000001ac0f      0x212 ./Proyecto/drivers/button/Src/button.o
+ .debug_info    0x000000000001ae21      0x1c7 ./Proyecto/drivers/button/Src/port_button.o
+ .debug_info    0x000000000001afe8      0x48d ./Proyecto/drivers/eeprom/Src/eeprom.o
+ .debug_info    0x000000000001b475      0x736 ./Proyecto/drivers/eeprom/Src/port_eeprom.o
+ .debug_info    0x000000000001bbab      0x72a ./Proyecto/drivers/rtc/Src/port_rtc.o
+ .debug_info    0x000000000001c2d5      0x275 ./Proyecto/drivers/rtc/Src/rtc.o
+ .debug_info    0x000000000001c54a      0x16e ./Proyecto/drivers/uart/Src/debug_uart.o
+ .debug_info    0x000000000001c6b8      0x649 ./Proyecto/drivers/uart/Src/port_debug_uart.o
+ .debug_info    0x000000000001cd01      0x10a ./Proyecto/drivers/usb_cdc/Src/port_usb_cdc.o
+ .debug_info    0x000000000001ce0b      0x26e ./Proyecto/drivers/usb_cdc/Src/usb_cdc.o
+ .debug_info    0x000000000001d079      0x374 ./Proyecto/drivers/usb_cdc/Src/usb_commands.o
+ .debug_info    0x000000000001d3ed       0x8b ./Proyecto/proyecto.o
+ .debug_info    0x000000000001d478      0x70e ./USB_DEVICE/App/usb_device.o
+ .debug_info    0x000000000001db86      0x91e ./USB_DEVICE/App/usbd_cdc_if.o
+ .debug_info    0x000000000001e4a4      0x4ba ./USB_DEVICE/App/usbd_desc.o
+ .debug_info    0x000000000001e95e     0x1f4b ./USB_DEVICE/Target/usbd_conf.o
 
 .debug_abbrev   0x0000000000000000     0x56ea
  .debug_abbrev  0x0000000000000000      0x301 ./Core/Src/main.o
@@ -9555,17 +9555,17 @@ LOAD C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .debug_str     0x00000000000e6973       0x7b ./Proyecto/app/app_isr.o
                                       0xdc64e (size before relaxing)
  .debug_str     0x00000000000e69ee       0x58 ./Proyecto/drivers/bt/Src/bt.o
-                                       0x724a (size before relaxing)
+                                       0x7251 (size before relaxing)
  .debug_str     0x00000000000e6a46       0x25 ./Proyecto/drivers/bt/Src/port_bt.o
-                                      0xd8ebb (size before relaxing)
+                                      0xd8ec2 (size before relaxing)
  .debug_str     0x00000000000e6a6b       0x8d ./Proyecto/drivers/button/Src/button.o
                                       0xdbb2a (size before relaxing)
  .debug_str     0x00000000000e6af8       0x4c ./Proyecto/drivers/button/Src/port_button.o
                                       0xd8984 (size before relaxing)
  .debug_str     0x00000000000e6b44       0x77 ./Proyecto/drivers/eeprom/Src/eeprom.o
-                                       0x7b08 (size before relaxing)
+                                       0x7b0f (size before relaxing)
  .debug_str     0x00000000000e6bbb       0x63 ./Proyecto/drivers/eeprom/Src/port_eeprom.o
-                                      0xd8f79 (size before relaxing)
+                                      0xd8f80 (size before relaxing)
  .debug_str     0x00000000000e6c1e       0x7f ./Proyecto/drivers/rtc/Src/port_rtc.o
                                       0xd8f77 (size before relaxing)
  .debug_str     0x00000000000e6c9d       0x4e ./Proyecto/drivers/rtc/Src/rtc.o

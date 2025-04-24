@@ -6,7 +6,7 @@
 #include "port_eeprom.h"
 
 // ─── Inicialización de EEPROM ─────────────────────────────────────────────
-bool eeprom_init(void)
+bool_t eeprom_init(void)
 {
     uint8_t sig;
 
@@ -42,7 +42,7 @@ bool eeprom_init(void)
 }
 
 // ─── Leer thresholds LOW y HIGH ───────────────────────────────────────────
-bool eeprom_read_thresholds(uint16_t *low, uint16_t *high)
+bool_t eeprom_read_thresholds(uint16_t *low, uint16_t *high)
 {
     uint8_t buf[2*2];
     if (!eeprom_read(EEPROM_THRESH_ADDR, buf, sizeof(buf))) {
@@ -55,7 +55,7 @@ bool eeprom_read_thresholds(uint16_t *low, uint16_t *high)
 }
 
 // ─── Escribir nuevos thresholds ───────────────────────────────────────────
-bool eeprom_write_thresholds(uint16_t low, uint16_t high)
+bool_t eeprom_write_thresholds(uint16_t low, uint16_t high)
 {
     uint8_t buf[2*2];
     buf[0] = (uint8_t)(low & 0xFF);
@@ -66,7 +66,7 @@ bool eeprom_write_thresholds(uint16_t low, uint16_t high)
 }
 
 // ─── Guardar nuevo evento de ruido alto ───────────────────────────────────
-bool eeprom_log_high_event(const eeprom_log_entry_t *evt)
+bool_t eeprom_log_high_event(const eeprom_log_entry_t *evt)
 {
     uint8_t head, count;
 
@@ -106,7 +106,7 @@ bool eeprom_log_high_event(const eeprom_log_entry_t *evt)
 }
 
 // ─── Leer los últimos eventos registrados ────────────────────────────────
-bool eeprom_read_log(eeprom_log_entry_t *entries,
+bool_t eeprom_read_log(eeprom_log_entry_t *entries,
                      uint8_t max_entries,
                      uint8_t *out_count)
 {
@@ -167,7 +167,7 @@ void eeprom_erase_log(void)
 }
 
 // ─── Restaurar los thresholds por defecto ────────────────────────────────
-bool eeprom_restore_defaults(void)
+bool_t eeprom_restore_defaults(void)
 {
     return eeprom_write_thresholds(DEFAULT_THRESHOLD_LOW,
                                    DEFAULT_THRESHOLD_HIGH);

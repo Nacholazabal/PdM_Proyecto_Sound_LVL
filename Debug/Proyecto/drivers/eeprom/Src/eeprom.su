@@ -1,7 +1,7 @@
-../Proyecto/drivers/eeprom/Src/eeprom.c:9:6:eeprom_init	24	static
-../Proyecto/drivers/eeprom/Src/eeprom.c:45:6:eeprom_read_thresholds	24	static
-../Proyecto/drivers/eeprom/Src/eeprom.c:58:6:eeprom_write_thresholds	24	static
-../Proyecto/drivers/eeprom/Src/eeprom.c:69:6:eeprom_log_high_event	56	static
-../Proyecto/drivers/eeprom/Src/eeprom.c:109:6:eeprom_read_log	32	static
+../Proyecto/drivers/eeprom/Src/eeprom.c:9:8:eeprom_init	24	static
+../Proyecto/drivers/eeprom/Src/eeprom.c:45:8:eeprom_read_thresholds	24	static
+../Proyecto/drivers/eeprom/Src/eeprom.c:58:8:eeprom_write_thresholds	24	static
+../Proyecto/drivers/eeprom/Src/eeprom.c:69:8:eeprom_log_high_event	56	static
+../Proyecto/drivers/eeprom/Src/eeprom.c:109:8:eeprom_read_log	32	static
 ../Proyecto/drivers/eeprom/Src/eeprom.c:150:6:eeprom_erase_log	24	static
-../Proyecto/drivers/eeprom/Src/eeprom.c:170:6:eeprom_restore_defaults	8	static
+../Proyecto/drivers/eeprom/Src/eeprom.c:170:8:eeprom_restore_defaults	8	static

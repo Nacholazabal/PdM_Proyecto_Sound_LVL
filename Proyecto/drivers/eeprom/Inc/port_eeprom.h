@@ -11,12 +11,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+typedef bool bool_t;
 /**
  * Inicializa el periférico I2C usado para la EEPROM.
  *
  * @return true si la inicialización fue exitosa.
  */
-bool port_eeprom_init(void);
+bool_t port_eeprom_init(void);
 
 /**
  * Lee una cantidad de bytes desde una dirección específica de la EEPROM.
@@ -26,7 +27,7 @@ bool port_eeprom_init(void);
  * @param len      Cantidad de bytes a leer.
  * @return true si la lectura fue exitosa.
  */
-bool eeprom_read(uint16_t mem_addr, uint8_t *data, uint16_t len);
+bool_t eeprom_read(uint16_t mem_addr, uint8_t *data, uint16_t len);
 
 /**
  * Escribe datos en la EEPROM a partir de una dirección dada.
@@ -36,4 +37,4 @@ bool eeprom_read(uint16_t mem_addr, uint8_t *data, uint16_t len);
  * @param len      Cantidad de bytes a escribir.
  * @return true si la escritura fue exitosa.
  */
-bool eeprom_write(uint16_t mem_addr, const uint8_t *data, uint16_t len);
+bool_t eeprom_write(uint16_t mem_addr, const uint8_t *data, uint16_t len);

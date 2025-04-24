@@ -17,7 +17,7 @@ extern UART_HandleTypeDef huart1;
  *
  * @return true si HAL_UART_Init devuelve HAL_OK
  */
-bool port_bt_init(void) {
+bool_t port_bt_init(void) {
     return HAL_UART_Init(&huart1) == HAL_OK;
 }
 
@@ -28,6 +28,6 @@ bool port_bt_init(void) {
  * @param len Cantidad de bytes del buffer.
  * @return true si la transmisión fue exitosa.
  */
-bool port_bt_send(const uint8_t* data, size_t len) {
+bool_t port_bt_send(const uint8_t* data, size_t len) {
     return HAL_UART_Transmit(&huart1, (uint8_t*)data, len, HAL_MAX_DELAY) == HAL_OK;
 }

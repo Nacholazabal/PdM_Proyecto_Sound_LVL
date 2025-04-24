@@ -1,2 +1,2 @@
-../Proyecto/drivers/bt/Src/port_bt.c:20:6:port_bt_init	8	static
-../Proyecto/drivers/bt/Src/port_bt.c:31:6:port_bt_send	16	static
+../Proyecto/drivers/bt/Src/port_bt.c:20:8:port_bt_init	8	static
+../Proyecto/drivers/bt/Src/port_bt.c:31:8:port_bt_send	16	static

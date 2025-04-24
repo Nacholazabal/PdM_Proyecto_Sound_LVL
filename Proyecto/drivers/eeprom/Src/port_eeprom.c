@@ -18,7 +18,7 @@ extern I2C_HandleTypeDef hi2c1;
  *
  * En este caso, no se hace nada porque CubeMX ya inicializa I2C en main().
  */
-bool port_eeprom_init(void)
+bool_t port_eeprom_init(void)
 {
     return true;
 }
@@ -26,7 +26,7 @@ bool port_eeprom_init(void)
 /**
  * Lee datos desde la EEPROM por I2C.
  */
-bool eeprom_read(uint16_t mem_addr, uint8_t *data, uint16_t len)
+bool_t eeprom_read(uint16_t mem_addr, uint8_t *data, uint16_t len)
 {
     return (HAL_I2C_Mem_Read(&hi2c1,
                              EEPROM_I2C_ADDR,
@@ -42,7 +42,7 @@ bool eeprom_read(uint16_t mem_addr, uint8_t *data, uint16_t len)
  *
  * Luego de escribir, espera al menos 6 ms para completar el ciclo interno de escritura.
  */
-bool eeprom_write(uint16_t mem_addr, const uint8_t *data, uint16_t len)
+bool_t eeprom_write(uint16_t mem_addr, const uint8_t *data, uint16_t len)
 {
     if (HAL_I2C_Mem_Write(&hi2c1,
                           EEPROM_I2C_ADDR,

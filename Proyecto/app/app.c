@@ -186,9 +186,7 @@ static void on_usb_command(void)
     usb_command_t cmd = usb_commands_get(&act);
     switch (cmd) {
         case CMD_GET_THRESH: {
-            snprintf(buf, sizeof(buf),
-                     "TH_LOW=%u TH_HIGH=%u\r\n",
-                     threshold_low, threshold_high);
+            snprintf(buf, sizeof(buf), "TH_LOW=%u TH_HIGH=%u\r\n", threshold_low, threshold_high);
             usb_cdc_sendString(buf);
             break;
         }

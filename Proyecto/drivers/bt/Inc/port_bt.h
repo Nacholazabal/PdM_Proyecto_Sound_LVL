@@ -13,6 +13,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+typedef bool bool_t;
+
 /**
  * @brief Inicializa la interfaz UART para el módulo Bluetooth.
  *
@@ -20,7 +22,7 @@
  *
  * @return true si la inicialización fue exitosa.
  */
-bool port_bt_init(void);
+bool_t port_bt_init(void);
 
 /**
  * @brief Envía datos por la interfaz Bluetooth (UART).
@@ -29,6 +31,6 @@ bool port_bt_init(void);
  * @param len Longitud del buffer.
  * @return true si la transmisión fue exitosa.
  */
-bool port_bt_send(const uint8_t* data, size_t len);
+bool_t port_bt_send(const uint8_t* data, size_t len);
 
 #endif // PORT_BT_H

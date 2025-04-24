@@ -21,6 +21,7 @@
 #define EEPROM_LOG_MAX_ENTRIES   10        ///< Máximo de entradas a almacenar
 #define EEPROM_LOG_ENTRY_SIZE    sizeof(eeprom_log_entry_t) ///< Tamaño de cada entrada
 
+typedef bool bool_t;
 // ─── Estructura de log en EEPROM ──────────────────────────────────────
 typedef struct {
     uint8_t  year, month, day;
@@ -35,7 +36,7 @@ typedef struct {
  *
  * @return true si todo fue correcto, false en caso de error.
  */
-bool eeprom_init(void);
+bool_t eeprom_init(void);
 
 /**
  * @brief Lee los umbrales LOW y HIGH desde la EEPROM.
@@ -45,7 +46,7 @@ bool eeprom_init(void);
  *
  * @return true si la lectura fue exitosa.
  */
-bool eeprom_read_thresholds(uint16_t *low, uint16_t *high);
+bool_t eeprom_read_thresholds(uint16_t *low, uint16_t *high);
 
 /**
  * @brief Escribe nuevos valores de umbral bajo y alto en EEPROM.
@@ -55,7 +56,7 @@ bool eeprom_read_thresholds(uint16_t *low, uint16_t *high);
  *
  * @return true si ambas escrituras fueron exitosas.
  */
-bool eeprom_write_thresholds(uint16_t low, uint16_t high);
+bool_t eeprom_write_thresholds(uint16_t low, uint16_t high);
 
 /**
  * @brief Guarda una nueva entrada en el log de eventos de alto ruido.
@@ -64,7 +65,7 @@ bool eeprom_write_thresholds(uint16_t low, uint16_t high);
  *
  * @return true si se escribió correctamente.
  */
-bool eeprom_log_high_event(const eeprom_log_entry_t *evt);
+bool_t eeprom_log_high_event(const eeprom_log_entry_t *evt);
 
 /**
  * @brief Lee las últimas entradas del log de eventos de ruido alto.
@@ -75,7 +76,7 @@ bool eeprom_log_high_event(const eeprom_log_entry_t *evt);
  *
  * @return true si se leyeron correctamente.
  */
-bool eeprom_read_log(eeprom_log_entry_t *entries, uint8_t max_entries, uint8_t *out_count);
+bool_t eeprom_read_log(eeprom_log_entry_t *entries, uint8_t max_entries, uint8_t *out_count);
 
 /**
  * @brief Borra el contenido del log de eventos.
@@ -89,4 +90,4 @@ void eeprom_erase_log(void);
  *
  * @return true si todas las escrituras fueron exitosas, false en error.
  */
-bool eeprom_restore_defaults(void);
+bool_t eeprom_restore_defaults(void);

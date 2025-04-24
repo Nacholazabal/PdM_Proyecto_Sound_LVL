@@ -2,4 +2,4 @@
 ../Proyecto/app/app.c:98:13:on_idle	5
 ../Proyecto/app/app.c:128:13:on_monitoring	4
 ../Proyecto/app/app.c:182:13:on_usb_command	11
-../Proyecto/app/app.c:265:6:appUpdate	5
+../Proyecto/app/app.c:263:6:appUpdate	5

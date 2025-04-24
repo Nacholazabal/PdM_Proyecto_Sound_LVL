@@ -12,7 +12,7 @@
 /**
  * Inicializa el módulo Bluetooth llamando al port específico.
  */
-bool bt_init(void) {
+bool_t bt_init(void) {
     return port_bt_init();
 }
 
@@ -20,13 +20,13 @@ bool bt_init(void) {
  * Envía un string como mensaje Bluetooth usando la función raw.
  * Internamente convierte el string a un buffer de bytes.
  */
-bool bt_send(const char* msg) {
+bool_t bt_send(const char* msg) {
     return bt_send_raw((const uint8_t*)msg, strlen(msg));
 }
 
 /**
  * Envía datos crudos por Bluetooth usando la función del port.
  */
-bool bt_send_raw(const uint8_t* data, size_t len) {
+bool_t bt_send_raw(const uint8_t* data, size_t len) {
     return port_bt_send(data, len);
 }

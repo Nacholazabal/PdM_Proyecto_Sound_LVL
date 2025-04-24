@@ -13,6 +13,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+typedef bool bool_t;
 /**
  * @brief Inicializa el módulo Bluetooth.
  *
@@ -20,7 +21,7 @@
  *
  * @return true si la inicialización fue exitosa, false en caso contrario.
  */
-bool bt_init(void);
+bool_t bt_init(void);
 
 /**
  * @brief Envía un mensaje de texto por Bluetooth.
@@ -30,7 +31,7 @@ bool bt_init(void);
  * @param msg Puntero al string nulo-terminado a enviar.
  * @return true si el mensaje fue enviado correctamente.
  */
-bool bt_send(const char* msg);
+bool_t bt_send(const char* msg);
 
 /**
  * @brief Envía datos crudos (binarios) por Bluetooth.
@@ -39,6 +40,6 @@ bool bt_send(const char* msg);
  * @param len Longitud del buffer.
  * @return true si los datos fueron enviados correctamente.
  */
-bool bt_send_raw(const uint8_t* data, size_t len);
+bool_t bt_send_raw(const uint8_t* data, size_t len);
 
 #endif // BT_H
