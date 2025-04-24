@@ -3,4 +3,4 @@
 ../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:47:6:usb_cdc_isCommandPending	1
 ../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:51:13:usb_cdc_getCommand	1
 ../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:55:6:usb_cdc_clearCommand	1
-../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:60:5:usb_cdc_sendString	1
+../Proyecto/drivers/usb_cdc/Src/usb_cdc.c:60:9:usb_cdc_sendString	1

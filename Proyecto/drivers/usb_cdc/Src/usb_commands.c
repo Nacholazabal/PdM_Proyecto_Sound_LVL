@@ -20,12 +20,12 @@ void usb_commands_init(void) {
     usb_cdc_init();
 }
 
-bool usb_commands_pending(void) {
+bool_t usb_commands_pending(void) {
     return usb_cdc_isCommandPending();
 }
 
 // Parsea los argumentos del comando 'settime'
-static bool parse_settime_args(const char *args, rtc_datetime_t *dt) {
+static bool_t parse_settime_args(const char *args, rtc_datetime_t *dt) {
     unsigned int yy, MM, DD, hh, mm, ss;
     int matched = sscanf(args, "%u %u %u %u %u %u", &yy, &MM, &DD, &hh, &mm, &ss);
     if (matched != 6) {

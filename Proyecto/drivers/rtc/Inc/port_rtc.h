@@ -9,6 +9,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+typedef bool bool_t;
 
 /**
  * Inicializa la interfaz I2C usada por el RTC.
@@ -17,7 +18,7 @@
  *
  * @return true si la inicialización fue exitosa.
  */
-bool port_rtc_init(void);
+bool_t port_rtc_init(void);
 
 /**
  * Lee bytes desde registros del DS1307 a partir de una dirección.
@@ -28,7 +29,7 @@ bool port_rtc_init(void);
  *
  * @return true si la lectura fue exitosa.
  */
-bool port_rtc_read(uint8_t reg_addr, uint8_t *buf, uint8_t len);
+bool_t port_rtc_read(uint8_t reg_addr, uint8_t *buf, uint8_t len);
 
 /**
  * Escribe datos en registros del DS1307 a partir de una dirección.
@@ -39,6 +40,6 @@ bool port_rtc_read(uint8_t reg_addr, uint8_t *buf, uint8_t len);
  *
  * @return true si la escritura fue exitosa.
  */
-bool port_rtc_write(uint8_t reg_addr, const uint8_t *buf, uint8_t len);
+bool_t port_rtc_write(uint8_t reg_addr, const uint8_t *buf, uint8_t len);
 
 #endif // PORT_RTC

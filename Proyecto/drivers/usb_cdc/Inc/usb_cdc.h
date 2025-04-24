@@ -64,6 +64,6 @@ void usb_cdc_clearCommand(void);
  * @param str Puntero al string null-terminado.
  * @return 0 si fue exitoso, distinto de 0 si hubo error.
  */
-int usb_cdc_sendString(const char* str);
+uint8_t usb_cdc_sendString(const char* str);
 
 #endif // USB_CDC_H

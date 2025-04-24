@@ -15,11 +15,11 @@ static uint8_t bin2bcd(uint8_t v) {
 }
 
 // Bandera que indica si el RTC fue correctamente configurado y activado
-static bool time_set = false;
+static bool_t time_set = false;
 
 // === Funciones públicas ===
 
-bool rtc_init(void)
+bool_t rtc_init(void)
 {
     port_rtc_init();
 
@@ -34,12 +34,12 @@ bool rtc_init(void)
     return true;
 }
 
-bool rtc_is_set(void)
+bool_t rtc_is_set(void)
 {
     return time_set;
 }
 
-bool rtc_get_datetime(rtc_datetime_t *dt)
+bool_t rtc_get_datetime(rtc_datetime_t *dt)
 {
     if (!time_set) return false;
 
@@ -60,7 +60,7 @@ bool rtc_get_datetime(rtc_datetime_t *dt)
     return true;
 }
 
-bool rtc_set_datetime(const rtc_datetime_t *dt)
+bool_t rtc_set_datetime(const rtc_datetime_t *dt)
 {
     uint8_t buf[8];
 

@@ -1,4 +1,11 @@
-#pragma once
+/**
+ * @file eeprom.h
+ * @brief Módulo de acceso a EEPROM externa (24C32) para almacenamiento de eventos y configuración.
+ */
+
+#ifndef EEPROM_H
+#define EEPROM_H
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -91,3 +98,5 @@ void eeprom_erase_log(void);
  * @return true si todas las escrituras fueron exitosas, false en error.
  */
 bool_t eeprom_restore_defaults(void);
+
+#endif // EEPROM_H

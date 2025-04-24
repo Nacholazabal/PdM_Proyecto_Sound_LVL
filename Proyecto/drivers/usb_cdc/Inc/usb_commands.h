@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "rtc.h"  // Para rtc_datetime_t
-
+typedef bool bool_t;
 // Texto de los comandos reconocidos
 #define USB_CMD_GET_THRESH  "getth"
 #define USB_CMD_SET_THRESH  "setth"
@@ -51,7 +51,7 @@ void usb_commands_init(void);
  *
  * @return true si hay un comando disponible, false si no.
  */
-bool usb_commands_pending(void);
+bool_t usb_commands_pending(void);
 
 /**
  * @brief Devuelve el comando recibido y lo interpreta.

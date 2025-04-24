@@ -6,7 +6,6 @@
  */
 
 // === Includes ===
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -22,7 +21,7 @@ extern UART_HandleTypeDef huart2;
  *
  * La configuración de baudrate, pines y DMA debe hacerse con STM32CubeMX.
  */
-bool port_debug_uart_init(void) {
+bool_t port_debug_uart_init(void) {
     return HAL_UART_Init(&huart2) == HAL_OK;
 }
 
@@ -31,6 +30,6 @@ bool port_debug_uart_init(void) {
  *
  * Esta función es bloqueante: espera hasta que se transmitan todos los datos.
  */
-bool port_debug_uart_send(const uint8_t* data, size_t len) {
+bool_t port_debug_uart_send(const uint8_t* data, size_t len) {
     return HAL_UART_Transmit(&huart2, (uint8_t*)data, len, HAL_MAX_DELAY) == HAL_OK;
 }

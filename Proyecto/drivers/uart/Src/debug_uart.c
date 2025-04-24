@@ -16,7 +16,7 @@
  *
  * La configuración específica del hardware se hace en port_debug_uart.
  */
-bool debug_uart_init(void) {
+bool_t debug_uart_init(void) {
     return port_debug_uart_init();
 }
 
@@ -25,13 +25,13 @@ bool debug_uart_init(void) {
  *
  * Internamente convierte el string a un buffer de bytes y llama a la función binaria.
  */
-bool debug_uart_print(const char* msg) {
+bool_t debug_uart_print(const char* msg) {
     return debug_uart_send_raw((const uint8_t*)msg, strlen(msg));
 }
 
 /**
  * Envía datos crudos (bytes) a través de la UART de debug.
  */
-bool debug_uart_send_raw(const uint8_t* data, size_t len) {
+bool_t debug_uart_send_raw(const uint8_t* data, size_t len) {
     return port_debug_uart_send(data, len);
 }

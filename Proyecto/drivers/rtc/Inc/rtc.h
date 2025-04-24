@@ -2,7 +2,7 @@
 #define RTC_H
 #include <stdbool.h>
 #include <stdint.h>
-
+typedef bool bool_t;
 /**
  * @brief Estructura que representa fecha y hora del RTC.
  *
@@ -25,7 +25,7 @@ typedef struct {
  *
  * @return true si I²C funciona y se pudo leer el RTC.
  */
-bool rtc_init(void);
+bool_t rtc_init(void);
 
 /**
  * @brief Verifica si el RTC tiene una hora válida cargada.
@@ -34,7 +34,7 @@ bool rtc_init(void);
  *
  * @return true si el reloj está corriendo.
  */
-bool rtc_is_set(void);
+bool_t rtc_is_set(void);
 
 /**
  * @brief Lee la fecha y hora actuales desde el RTC.
@@ -42,7 +42,7 @@ bool rtc_is_set(void);
  * @param[out] dt Estructura donde se guardará la fecha y hora.
  * @return true si la lectura fue exitosa.
  */
-bool rtc_get_datetime(rtc_datetime_t *dt);
+bool_t rtc_get_datetime(rtc_datetime_t *dt);
 
 /**
  * @brief Escribe fecha y hora en el RTC.
@@ -52,6 +52,6 @@ bool rtc_get_datetime(rtc_datetime_t *dt);
  * @param[in] dt Fecha y hora a establecer.
  * @return true si se escribió correctamente.
  */
-bool rtc_set_datetime(const rtc_datetime_t *dt);
+bool_t rtc_set_datetime(const rtc_datetime_t *dt);
 
 #endif // RTC_H

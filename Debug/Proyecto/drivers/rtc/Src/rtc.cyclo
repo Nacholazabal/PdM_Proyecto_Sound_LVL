@@ -1,6 +1,6 @@
 ../Proyecto/drivers/rtc/Src/rtc.c:8:16:bcd2bin	1
 ../Proyecto/drivers/rtc/Src/rtc.c:13:16:bin2bcd	1
-../Proyecto/drivers/rtc/Src/rtc.c:22:6:rtc_init	2
-../Proyecto/drivers/rtc/Src/rtc.c:37:6:rtc_is_set	1
-../Proyecto/drivers/rtc/Src/rtc.c:42:6:rtc_get_datetime	3
-../Proyecto/drivers/rtc/Src/rtc.c:63:6:rtc_set_datetime	2
+../Proyecto/drivers/rtc/Src/rtc.c:22:8:rtc_init	2
+../Proyecto/drivers/rtc/Src/rtc.c:37:8:rtc_is_set	1
+../Proyecto/drivers/rtc/Src/rtc.c:42:8:rtc_get_datetime	3
+../Proyecto/drivers/rtc/Src/rtc.c:63:8:rtc_set_datetime	2

@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-
+typedef bool bool_t;
 /**
  * @brief Inicializa el periférico UART utilizado para debug.
  *
@@ -21,7 +21,7 @@
  *
  * @return true si la UART se inicializó correctamente.
  */
-bool port_debug_uart_init(void);
+bool_t port_debug_uart_init(void);
 
 /**
  * @brief Envía datos binarios por la UART de debug.
@@ -30,6 +30,6 @@ bool port_debug_uart_init(void);
  * @param len  Longitud del buffer en bytes.
  * @return true si los datos fueron enviados correctamente.
  */
-bool port_debug_uart_send(const uint8_t* data, size_t len);
+bool_t port_debug_uart_send(const uint8_t* data, size_t len);
 
 #endif // PORT_DEBUG_UART_H

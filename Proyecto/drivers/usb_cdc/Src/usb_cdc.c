@@ -57,7 +57,7 @@ void usb_cdc_clearCommand(void) {
     memset(usb_cmd_buffer, 0, USB_CMD_BUFFER_SIZE);
 }
 
-int usb_cdc_sendString(const char *str) {
+uint8_t usb_cdc_sendString(const char *str) {
     uint16_t len = (uint16_t) strlen(str);
     return port_usb_cdc_transmit((const uint8_t*) str, len);
 }

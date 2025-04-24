@@ -1,3 +1,3 @@
-../Proyecto/drivers/rtc/Src/port_rtc.c:24:6:port_rtc_init	4	static
-../Proyecto/drivers/rtc/Src/port_rtc.c:34:6:port_rtc_read	32	static
-../Proyecto/drivers/rtc/Src/port_rtc.c:51:6:port_rtc_write	32	static
+../Proyecto/drivers/rtc/Src/port_rtc.c:23:8:port_rtc_init	4	static
+../Proyecto/drivers/rtc/Src/port_rtc.c:33:8:port_rtc_read	32	static
+../Proyecto/drivers/rtc/Src/port_rtc.c:50:8:port_rtc_write	32	static

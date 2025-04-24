@@ -6,7 +6,8 @@
  * utilizando la interfaz I2C (por ejemplo, un AT24C32).
  */
 
-#pragma once
+#ifndef PORT_EEPROM_H
+#define PORT_EEPROM_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -38,3 +39,5 @@ bool_t eeprom_read(uint16_t mem_addr, uint8_t *data, uint16_t len);
  * @return true si la escritura fue exitosa.
  */
 bool_t eeprom_write(uint16_t mem_addr, const uint8_t *data, uint16_t len);
+
+#endif // PORT_EEPROM_H
