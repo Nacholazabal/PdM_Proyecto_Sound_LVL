@@ -1,6 +1,6 @@
 Proyecto/drivers/eeprom/Src/port_eeprom.o: \
  ../Proyecto/drivers/eeprom/Src/port_eeprom.c \
- C:/Users/Ignacio/Desktop/Postgrado/Programacion\ de\ MCUs/PdM_Proyecto_Sound_LVL/Proyecto/drivers/eeprom/Inc/port_eeprom.h \
+ C:/Users/nacho/PdM_Proyecto_Sound_LVL/Proyecto/drivers/eeprom/Inc/port_eeprom.h \
  ../Core/Inc/main.h ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -37,7 +37,7 @@ Proyecto/drivers/eeprom/Src/port_eeprom.o: \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h
-C:/Users/Ignacio/Desktop/Postgrado/Programacion\ de\ MCUs/PdM_Proyecto_Sound_LVL/Proyecto/drivers/eeprom/Inc/port_eeprom.h:
+C:/Users/nacho/PdM_Proyecto_Sound_LVL/Proyecto/drivers/eeprom/Inc/port_eeprom.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:

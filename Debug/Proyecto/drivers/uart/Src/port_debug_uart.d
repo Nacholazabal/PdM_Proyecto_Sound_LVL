@@ -36,7 +36,7 @@ Proyecto/drivers/uart/Src/port_debug_uart.o: \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h \
- C:/Users/Ignacio/Desktop/Postgrado/Programacion\ de\ MCUs/PdM_Proyecto_Sound_LVL/Proyecto/drivers/uart/Inc/port_debug_uart.h
+ C:/Users/nacho/PdM_Proyecto_Sound_LVL/Proyecto/drivers/uart/Inc/port_debug_uart.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -74,4 +74,4 @@ Proyecto/drivers/uart/Src/port_debug_uart.o: \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h:
-C:/Users/Ignacio/Desktop/Postgrado/Programacion\ de\ MCUs/PdM_Proyecto_Sound_LVL/Proyecto/drivers/uart/Inc/port_debug_uart.h:
+C:/Users/nacho/PdM_Proyecto_Sound_LVL/Proyecto/drivers/uart/Inc/port_debug_uart.h:

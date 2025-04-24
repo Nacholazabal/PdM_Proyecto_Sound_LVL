@@ -1,6 +1,6 @@
 Proyecto/drivers/usb_cdc/Src/port_usb_cdc.o: \
  ../Proyecto/drivers/usb_cdc/Src/port_usb_cdc.c \
- C:/Users/Ignacio/Desktop/Postgrado/Programacion\ de\ MCUs/PdM_Proyecto_Sound_LVL/Proyecto/drivers/usb_cdc/Inc/port_usb_cdc.h \
+ C:/Users/nacho/PdM_Proyecto_Sound_LVL/Proyecto/drivers/usb_cdc/Inc/port_usb_cdc.h \
  ../USB_DEVICE/App/usbd_cdc_if.h \
  ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc/usbd_cdc.h \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h \
@@ -45,7 +45,7 @@ Proyecto/drivers/usb_cdc/Src/port_usb_cdc.o: \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h
-C:/Users/Ignacio/Desktop/Postgrado/Programacion\ de\ MCUs/PdM_Proyecto_Sound_LVL/Proyecto/drivers/usb_cdc/Inc/port_usb_cdc.h:
+C:/Users/nacho/PdM_Proyecto_Sound_LVL/Proyecto/drivers/usb_cdc/Inc/port_usb_cdc.h:
 ../USB_DEVICE/App/usbd_cdc_if.h:
 ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc/usbd_cdc.h:
 ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h:
