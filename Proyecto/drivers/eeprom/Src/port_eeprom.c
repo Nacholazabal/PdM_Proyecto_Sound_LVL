@@ -1,17 +1,31 @@
+/**
+ * @file port_eeprom.c
+ * @brief Implementación de funciones de acceso a EEPROM externa vía I2C.
+ *
+ * Utiliza funciones HAL para leer y escribir datos a través de I2C en una EEPROM externa.
+ */
+
 #include "port_eeprom.h"
-#include "main.h"          // for extern I2C handle
+#include "main.h"          // handler I2C externo
 #include "stm32f4xx_hal.h"
 
-#define EEPROM_I2C_ADDR    (0x50 << 1)   // AT24C32 base address
+#define EEPROM_I2C_ADDR    (0x50 << 1)   ///< Dirección base del dispositivo AT24C32
 
-extern I2C_HandleTypeDef hi2c1;          // from main.h
+extern I2C_HandleTypeDef hi2c1;
 
+/**
+ * Inicializa el periférico I2C para la EEPROM.
+ *
+ * En este caso, no se hace nada porque CubeMX ya inicializa I2C en main().
+ */
 bool port_eeprom_init(void)
 {
-    // nothing to do: CubeMX already calls HAL_I2C_Init(&hi2c1)
     return true;
 }
 
+/**
+ * Lee datos desde la EEPROM por I2C.
+ */
 bool eeprom_read(uint16_t mem_addr, uint8_t *data, uint16_t len)
 {
     return (HAL_I2C_Mem_Read(&hi2c1,
@@ -23,6 +37,11 @@ bool eeprom_read(uint16_t mem_addr, uint8_t *data, uint16_t len)
                              500) == HAL_OK);
 }
 
+/**
+ * Escribe datos a la EEPROM por I2C.
+ *
+ * Luego de escribir, espera al menos 6 ms para completar el ciclo interno de escritura.
+ */
 bool eeprom_write(uint16_t mem_addr, const uint8_t *data, uint16_t len)
 {
     if (HAL_I2C_Mem_Write(&hi2c1,
@@ -35,7 +54,7 @@ bool eeprom_write(uint16_t mem_addr, const uint8_t *data, uint16_t len)
     {
         return false;
     }
-    // wait for the internal write cycle (~5 ms max)
+    // Esperamos el ciclo de escritura interna de la EEPROM (~5 ms)
     HAL_Delay(6);
     return true;
 }

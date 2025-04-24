@@ -2,55 +2,91 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-// EEPROM layout
-#define EEPROM_SIGNATURE_ADDR      0x0000
-#define EEPROM_SIGNATURE_VALUE     0xA5u
+// ─── Layout de la EEPROM ──────────────────────────────────────────────
+#define EEPROM_SIGNATURE_ADDR      0x0000  ///< Dirección de la firma de validación
+#define EEPROM_SIGNATURE_VALUE     0xA5u   ///< Valor esperado de la firma
 
-#define EEPROM_THRESH_ADDR         0x0001  // 2 bytes: LOW threshold
-#define EEPROM_HIGH_THRESH_ADDR    0x0003  // 2 bytes: HIGH threshold
+#define EEPROM_THRESH_ADDR         0x0001  ///< Dirección para el umbral bajo (LOW)
+#define EEPROM_HIGH_THRESH_ADDR    0x0003  ///< Dirección para el umbral alto (HIGH)
 
-// Default thresholds (named instead of “magic”)
-#define DEFAULT_THRESHOLD_LOW      10u
-#define DEFAULT_THRESHOLD_HIGH     20u
-// after your other #defines
+// ─── Valores por defecto para los umbrales ────────────────────────────
+#define DEFAULT_THRESHOLD_LOW      10u     ///< Umbral bajo por defecto
+#define DEFAULT_THRESHOLD_HIGH     20u     ///< Umbral alto por defecto
 
-// ─── Log ring buffer definitions ───────────────────────────────
-#define EEPROM_LOG_HEAD_ADDR     0x000F  // HEAD pointer
-#define EEPROM_LOG_COUNT_ADDR    0x0010  // COUNT of valid entries
-#define EEPROM_LOG_ENTRY_ADDR    0x0020  // first log slot
+// ─── Definiciones del buffer circular de logs ─────────────────────────
+#define EEPROM_LOG_HEAD_ADDR     0x000F    ///< Dirección del puntero HEAD
+#define EEPROM_LOG_COUNT_ADDR    0x0010    ///< Dirección del contador de entradas válidas
+#define EEPROM_LOG_ENTRY_ADDR    0x0020    ///< Dirección del primer slot de log
 
-#define EEPROM_LOG_MAX_ENTRIES   10
-#define EEPROM_LOG_ENTRY_SIZE    sizeof(eeprom_log_entry_t)
+#define EEPROM_LOG_MAX_ENTRIES   10        ///< Máximo de entradas a almacenar
+#define EEPROM_LOG_ENTRY_SIZE    sizeof(eeprom_log_entry_t) ///< Tamaño de cada entrada
 
+// ─── Estructura de log en EEPROM ──────────────────────────────────────
 typedef struct {
     uint8_t  year, month, day;
     uint8_t  hour, minute, second;
-    uint16_t level;
+    uint16_t level; ///< Nivel de ruido registrado
 } eeprom_log_entry_t;
 
-// Initialize EEPROM: if signature missing, write signature + default thresholds
+/**
+ * @brief Inicializa la EEPROM.
+ *
+ * Si no se detecta firma, se escribe la firma y se graban los umbrales por defecto.
+ *
+ * @return true si todo fue correcto, false en caso de error.
+ */
 bool eeprom_init(void);
 
-// Read back LOW and HIGH thresholds
+/**
+ * @brief Lee los umbrales LOW y HIGH desde la EEPROM.
+ *
+ * @param[out] low  Puntero donde se guardará el umbral bajo.
+ * @param[out] high Puntero donde se guardará el umbral alto.
+ *
+ * @return true si la lectura fue exitosa.
+ */
 bool eeprom_read_thresholds(uint16_t *low, uint16_t *high);
 
-// Write new LOW and HIGH thresholds
+/**
+ * @brief Escribe nuevos valores de umbral bajo y alto en EEPROM.
+ *
+ * @param low  Nuevo valor para el umbral bajo.
+ * @param high Nuevo valor para el umbral alto.
+ *
+ * @return true si ambas escrituras fueron exitosas.
+ */
 bool eeprom_write_thresholds(uint16_t low, uint16_t high);
 
-// (Log functions remain unchanged…)
+/**
+ * @brief Guarda una nueva entrada en el log de eventos de alto ruido.
+ *
+ * @param evt Puntero a la entrada de log a guardar.
+ *
+ * @return true si se escribió correctamente.
+ */
 bool eeprom_log_high_event(const eeprom_log_entry_t *evt);
 
-bool eeprom_read_log(eeprom_log_entry_t *entries,
-                     uint8_t max_entries,
-                     uint8_t *out_count);
+/**
+ * @brief Lee las últimas entradas del log de eventos de ruido alto.
+ *
+ * @param[out] entries     Arreglo donde se guardarán las entradas leídas.
+ * @param      max_entries Tamaño máximo del arreglo.
+ * @param[out] out_count   Cantidad real de entradas devueltas.
+ *
+ * @return true si se leyeron correctamente.
+ */
+bool eeprom_read_log(eeprom_log_entry_t *entries, uint8_t max_entries, uint8_t *out_count);
 
+/**
+ * @brief Borra el contenido del log de eventos.
+ */
 void eeprom_erase_log(void);
 
 /**
- * @brief  Restaura los thresholds LOW/HIGH a sus valores por defecto y
- *         marca la EEPROM como “primera vez” para que en el siguiente
- *         eeprom_init() se vuelvan a escribir esos defaults.
- * @return true si todas las escrituras tuvieron éxito, false en error.
+ * @brief Restaura los umbrales a valores por defecto.
+ *
+ * Marca también la EEPROM como no inicializada para que eeprom_init() reescriba los valores.
+ *
+ * @return true si todas las escrituras fueron exitosas, false en error.
  */
 bool eeprom_restore_defaults(void);
-
