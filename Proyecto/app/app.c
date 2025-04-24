@@ -1,63 +1,100 @@
-// app.c
-#include "bt.h"
-#include "stm32f4xx_hal.h"
-#include "main.h"
-#include "app.h"
-#include "app_isr.h"
-#include "usb_commands.h"
-#include "usb_cdc.h"
-#include "eeprom.h"
-#include "rtc.h"
-#include "debug_uart.h"
-#include "button.h"
-#include "API_delay.h"
-#include <stdio.h>
+//======================================================================================================================
+// app.c - Main application logic for sound level detector
+//======================================================================================================================
+
+// C Standard Libraries
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
+// STM32 HAL
+#include "stm32f4xx_hal.h"
+
+// Project Headers
+#include "API_delay.h"
+#include "app.h"
+#include "app_isr.h"
+#include "bt.h"
+#include "button.h"
+#include "debug_uart.h"
+#include "eeprom.h"
+#include "main.h"
+#include "rtc.h"
+#include "usb_cdc.h"
+#include "usb_commands.h"
+
+//----------------------------------------------------------------------------------------------------------------------
+// Defines
+//----------------------------------------------------------------------------------------------------------------------
+#define INIT_DELAY_MS         1000U   ///< Delay inicial de 1 segundo para la medición
+
+//----------------------------------------------------------------------------------------------------------------------
+// Tipos de datos privados
+//----------------------------------------------------------------------------------------------------------------------
 typedef enum {
-    STATE_INITIALIZING,
-    STATE_IDLE,
-    STATE_MONITORING,
-    STATE_USB_COMMAND
+    STATE_INITIALIZING,     ///< Estado inicial: se configuran periféricos y se carga configuración
+    STATE_IDLE,             ///< Estado de espera: sin medición activa
+    STATE_MONITORING,       ///< Estado de monitoreo de nivel de sonido
+    STATE_USB_COMMAND       ///< Estado de procesamiento de comandos USB
 } app_state_t;
 
-static app_state_t application_state = STATE_INITIALIZING;
-static delay_t     measureDelay;
-static uint16_t    threshold_low;
-static uint16_t    threshold_high;
+//----------------------------------------------------------------------------------------------------------------------
+// Variables privadas
+//----------------------------------------------------------------------------------------------------------------------
+static app_state_t application_state = STATE_INITIALIZING; ///< Estado actual de la aplicación
+static delay_t     measureDelay;                            ///< Delay no bloqueante para el muestreo
+static uint16_t    threshold_low;                           ///< Umbral inferior de nivel de sonido
+static uint16_t    threshold_high;                          ///< Umbral superior de nivel de sonido
 
-// these live in app_isr.c
-extern volatile uint16_t envelope;
-extern uint16_t          adc_dma_buffer[ADC_BUFFER_SIZE];
+// Variables compartidas con interrupciones (declaradas en app_isr.c)
+extern volatile uint16_t envelope;                          ///< Nivel de sonido actual (calculado en DMA)
+extern uint16_t          adc_dma_buffer[ADC_BUFFER_SIZE];   ///< Buffer DMA del ADC
 
+// Periféricos usados
 extern TIM_HandleTypeDef htim2;
 extern ADC_HandleTypeDef hadc1;
 
-//─── Initialization ─────────────────────────────────────────────────────────
+//----------------------------------------------------------------------------------------------------------------------
+// Funciones privadas
+//----------------------------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------
+// Manejo del estado de inicialización
+//----------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Inicializa los periféricos y carga configuración desde EEPROM.
+ *
+ * Inicia ADC con DMA, TIM2, carga umbrales de EEPROM y prepara drivers para operación.
+ */
 static void on_initializing(void)
 {
-	debug_uart_print("INIT: entering on_initializing()\r\n");
+    debug_uart_print("INIT: entering on_initializing()\r\n");
     usb_commands_init();
     eeprom_init();
     rtc_init();
     bt_init();
-    // load or default thresholds
+
+    // Leer umbrales desde EEPROM o usar valores por defecto si falla
     eeprom_read_thresholds(&threshold_low, &threshold_high);
 
-    // kick off TIM2→ADC1@1kHz DMA→256 samples
+    // Iniciar ADC1 con DMA a 1 kHz
     HAL_TIM_Base_Start(&htim2);
-    HAL_ADC_Start_DMA(&hadc1,
-                      (uint32_t*)adc_dma_buffer,
-                      ADC_BUFFER_SIZE);
+    HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_dma_buffer, ADC_BUFFER_SIZE);
 
-    // start a 1s non blocking delay
-    delayInit(&measureDelay, 1000);
+    // Iniciar delay no bloqueante de 1 segundo
+    delayInit(&measureDelay, INIT_DELAY_MS);
     debug_uart_print("INIT: drivers initialized\r\n");
     application_state = STATE_IDLE;
 }
 
-//─── Idle: wait for timeout or USB ────────────────────────────────────────────
+//----------------------------------------------------------------------------------------------------------------------
+// Manejo del estado IDLE
+//----------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Estado de espera. Gestiona botones y transición por timeout o USB.
+ */
 static void on_idle(void)
 {
     button_update();
@@ -81,36 +118,32 @@ static void on_idle(void)
     }
 }
 
-//─── Monitoring: show & log high events ──────────────────────────────────────
+//----------------------------------------------------------------------------------------------------------------------
+// Manejo del estado MONITORING
+//----------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Clasifica nivel de sonido, reporta y loguea si es alto.
+ */
 static void on_monitoring(void)
 {
     char buf[80];
-
-    // 0) Entry trace
     debug_uart_print("=== ENTER MONITORING ===\r\n");
-
-    // 1) Print the raw envelope value
-    //    (you may want to cast or format as integer or float)
     sprintf(buf, "DBG: Envelope = %u\r\n", envelope);
     debug_uart_print(buf);
 
-    // 2) Classify and report
     if (envelope <= threshold_low) {
         debug_uart_print("DBG: Classification → LOW NOISE\r\n");
         bt_send("LOW NOISE\r\n");
-    }
-    else if (envelope < threshold_high) {
+    } else if (envelope < threshold_high) {
         debug_uart_print("DBG: Classification → MEDIUM NOISE\r\n");
         bt_send("MEDIUM NOISE\r\n");
-    }
-    else {
+    } else {
         debug_uart_print("DBG: Classification → HIGH NOISE\r\n");
         bt_send("HIGH NOISE\r\n");
 
-        // 3) Log high‑noise event
         rtc_datetime_t dt;
         if (rtc_get_datetime(&dt)) {
-            // Debug‑print timestamp + level
             sprintf(buf,
                     "DBG: Logging @ %02u/%02u/20%02u %02u:%02u:%02u, lvl=%u\r\n",
                     dt.day, dt.month, dt.year,
@@ -118,7 +151,6 @@ static void on_monitoring(void)
                     envelope);
             debug_uart_print(buf);
 
-            // Prepare entry (level as integer)
             eeprom_log_entry_t entry = {
                 .year   = dt.year,
                 .month  = dt.month,
@@ -134,15 +166,19 @@ static void on_monitoring(void)
         }
     }
 
-    // 4) Exit trace
     debug_uart_print("=== EXIT MONITORING ===\r\n");
-
-    // 5) Restart 1 s timer & go back to IDLE
-    delayWrite(&measureDelay, 1000);
+    delayWrite(&measureDelay, INIT_DELAY_MS);
     application_state = STATE_IDLE;
 }
 
-//─── USB Command handler ─────────────────────────────────────────────────────
+//----------------------------------------------------------------------------------------------------------------------
+// Manejo del estado USB_COMMAND
+//----------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Procesa comandos entrantes desde la interfaz USB CDC.
+ */
+
 static void on_usb_command(void)
 {
     pending_action_t act;
@@ -216,23 +252,35 @@ static void on_usb_command(void)
     application_state = STATE_IDLE;
 }
 
-//─── Main loop ───────────────────────────────────────────────────────────────
-void app_entry_point(void)
+//----------------------------------------------------------------------------------------------------------------------
+// Funciones publicas
+//----------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Ejecuta el ciclo de aplicación según el estado actual.
+ *
+ * Lazo principal que evalúa el estado de la aplicación y despacha a los handlers correspondientes.
+ * Esta función bloquea y debe ser llamada una sola vez desde main().
+ */
+void appUpdate(void)
 {
     while (1) {
         switch (application_state) {
             case STATE_INITIALIZING:
-            	on_initializing();
-            	break;
+                on_initializing();
+                break;
+
             case STATE_IDLE:
-            	on_idle();
-            	break;
+                on_idle();
+                break;
+
             case STATE_MONITORING:
-            	on_monitoring();
-            	break;
+                on_monitoring();
+                break;
+
             case STATE_USB_COMMAND:
-            	on_usb_command();
-            	break;
+                on_usb_command();
+                break;
         }
     }
 }
